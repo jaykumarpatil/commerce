@@ -1,0 +1,20 @@
+# Fix: Ensure you have the right tag. 
+# Use 'qwen3.5:122b' for the standard instruct version.
+# FROM qwen3.5:122b-instruct-q4_K_M
+FROM qwen3.5:122b
+
+
+# Fix: Cleaned trailing spaces. 
+# On Apple Silicon, 99 ensures every MoE expert stays in Unified Memory.
+PARAMETER num_gpu 99
+
+# Fix: 128GB RAM can support 128k context for this MoE architecture.
+# (Weights ~70GB + KV Cache ~13GB = ~83GB Total)
+PARAMETER num_ctx 131072
+
+# Optimization for high-precision coding
+PARAMETER temperature 0.0
+PARAMETER repeat_penalty 1.1
+
+# 2026 specific: Enable the new internal "thinking" mode for complex logic
+# PARAMETER think true
