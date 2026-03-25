@@ -1,0 +1,43 @@
+server:
+  port: ${PORT:8082}
+
+spring:
+  application:
+    name: shopping-cart-service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017}
+      database: ${MONGODB_DATABASE:cartdb}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+  cloud:
+    stream:
+      bindings:
+        cart-events-out-0:
+          destination: cart-events
+          content-type: application/json
+
+eureka:
+  client:
+    enabled: ${ENABLE_EUREKA:false}
+    service-url:
+      defaultZone: ${EUREKA_URI:http://eureka:8761/eureka}
+  instance:
+    prefer-ip-address: true
+    hostname: ${HOSTNAME:shopping-cart-service}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    se.magnus: DEBUG
+    reactor: DEBUG

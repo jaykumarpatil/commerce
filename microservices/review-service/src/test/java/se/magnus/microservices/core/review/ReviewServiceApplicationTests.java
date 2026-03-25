@@ -98,8 +98,32 @@ class ReviewServiceApplicationTests extends MySqlTestBase {
     sendDeleteReviewEvent(productId);
   }
 
-  @Test
-  void getReviewsMissingParameter() {
+  @Test  void createAndDeleteReviewViaApi() {
+
+    int productId = 77;
+    int reviewId = 77;
+    Review review = new Review(productId, reviewId, "Author", "subject", "content", null);
+
+    client.post().uri("/review")
+      .contentType(APPLICATION_JSON)
+      .bodyValue(review)
+      .exchange()
+      .expectStatus().isOk()
+      .expectHeader().contentType(APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.productId").isEqualTo(productId)
+      .jsonPath("$.reviewId").isEqualTo(reviewId);
+
+    assertEquals(1, repository.findByProductId(productId).size());
+
+    client.delete().uri("/review?productId=" + productId)
+      .exchange()
+      .expectStatus().isOk();
+
+    assertEquals(0, repository.findByProductId(productId).size());
+  }
+
+  @Test  void getReviewsMissingParameter() {
 
     getAndVerifyReviewsByProductId("", BAD_REQUEST)
       .jsonPath("$.path").isEqualTo("/review")

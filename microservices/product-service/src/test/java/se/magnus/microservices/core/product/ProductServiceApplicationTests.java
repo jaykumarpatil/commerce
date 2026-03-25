@@ -90,6 +90,30 @@ class ProductServiceApplicationTests extends MongoDbTestBase {
   }
 
   @Test
+  void createAndDeleteProductViaApi() {
+
+    int productId = 42;
+    Product product = new Product(productId, "name 42", 42, null);
+
+    client.post().uri("/product")
+      .contentType(APPLICATION_JSON)
+      .bodyValue(product)
+      .exchange()
+      .expectStatus().isOk()
+      .expectHeader().contentType(APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.productId").isEqualTo(productId);
+
+    assertNotNull(repository.findByProductId(productId).block());
+
+    client.delete().uri("/product/" + productId)
+      .exchange()
+      .expectStatus().isOk();
+
+    assertNull(repository.findByProductId(productId).block());
+  }
+
+  @Test
   void getProductInvalidParameterString() {
 
     getAndVerifyProduct("/no-integer", BAD_REQUEST)

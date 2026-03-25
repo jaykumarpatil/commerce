@@ -92,6 +92,32 @@ class RecommendationServiceApplicationTests extends MongoDbTestBase {
   }
 
   @Test
+  void createAndDeleteRecommendationViaApi() {
+
+    int productId = 99;
+    int recommendationId = 99;
+    Recommendation recommendation = new Recommendation(productId, recommendationId, "Author", 5, "content", null);
+
+    client.post().uri("/recommendation")
+      .contentType(APPLICATION_JSON)
+      .bodyValue(recommendation)
+      .exchange()
+      .expectStatus().isOk()
+      .expectHeader().contentType(APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.productId").isEqualTo(productId)
+      .jsonPath("$.recommendationId").isEqualTo(recommendationId);
+
+    assertEquals(1, (long)repository.findByProductId(productId).count().block());
+
+    client.delete().uri("/recommendation?productId=" + productId)
+      .exchange()
+      .expectStatus().isOk();
+
+    assertEquals(0, (long)repository.findByProductId(productId).count().block());
+  }
+
+  @Test
   void getRecommendationsMissingParameter() {
 
     getAndVerifyRecommendationsByProductId("", BAD_REQUEST)

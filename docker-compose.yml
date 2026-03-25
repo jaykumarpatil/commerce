@@ -161,6 +161,236 @@ services:
       timeout: 2s
       retries: 60
 
+  user:
+    build: microservices/user-service
+    image: hands-on/user-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/user.yml
+      - SPRING_DATA_MONGODB_URI=mongodb://${MONGODB_USR}:${MONGODB_PWD}@mongodb:27017/admin
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  product-catalog:
+    build: microservices/product-catalog-service
+    image: hands-on/product-catalog-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/product-catalog.yml
+      - DATASOURCE_URL=jdbc:postgresql://postgres:5432/catalog
+      - DATASOURCE_USERNAME=${POSTGRES_USER}
+      - DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  shopping-cart:
+    build: microservices/shopping-cart-service
+    image: hands-on/shopping-cart-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/shopping-cart.yml
+      - SPRING_DATA_MONGODB_URI=mongodb://${MONGODB_USR}:${MONGODB_PWD}@mongodb:27017/admin
+      - REDIS_HOST=redis
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  order:
+    build: microservices/order-service
+    image: hands-on/order-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/order.yml
+      - DATASOURCE_URL=jdbc:postgresql://postgres:5432/orderdb
+      - DATASOURCE_USERNAME=${POSTGRES_USER}
+      - DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  inventory:
+    build: microservices/inventory-service
+    image: hands-on/inventory-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/inventory.yml
+      - DATASOURCE_URL=jdbc:postgresql://postgres:5432/inventorydb
+      - DATASOURCE_USERNAME=${POSTGRES_USER}
+      - DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  payment:
+    build: microservices/payment-service
+    image: hands-on/payment-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/payment.yml
+      - DATASOURCE_URL=jdbc:postgresql://postgres:5432/paymentdb
+      - DATASOURCE_USERNAME=${POSTGRES_USER}
+      - DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - STRIPE_API_KEY=${STRIPE_API_KEY}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  shipping:
+    build: microservices/shipping-service
+    image: hands-on/shipping-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/shipping.yml
+      - DATASOURCE_URL=jdbc:postgresql://postgres:5432/shippingdb
+      - DATASOURCE_USERNAME=${POSTGRES_USER}
+      - DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  notification:
+    build: microservices/notification-service
+    image: hands-on/notification-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/notification.yml
+      - DATASOURCE_URL=jdbc:postgresql://postgres:5432/notificationdb
+      - DATASOURCE_USERNAME=${POSTGRES_USER}
+      - DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  admin:
+    build: microservices/admin-service
+    image: hands-on/admin-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/admin.yml
+      - DATASOURCE_URL=jdbc:postgresql://postgres:5432/admindb
+      - DATASOURCE_USERNAME=${POSTGRES_USER}
+      - DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  analytics:
+    build: microservices/analytics-service
+    image: hands-on/analytics-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/analytics.yml
+      - DATASOURCE_URL=jdbc:postgresql://postgres:5432/analyticsdb
+      - DATASOURCE_USERNAME=${POSTGRES_USER}
+      - DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USR}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    mem_limit: 512m
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 2s
+      retries: 60
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    mem_limit: 256m
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 60
+
   jaeger-collector.istio-system:
     image: openzipkin/zipkin:2.24.0
     restart: always

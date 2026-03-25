@@ -1,0 +1,45 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: user-service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017}
+      database: ${MONGODB_DATABASE:userdb}
+  cloud:
+    stream:
+      bindings:
+        user-events-out-0:
+          destination: user-events
+          content-type: application/json
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:user-service-secret-key-2024}
+    expiration-in-milliseconds: ${JWT_EXPIRATION_MS:3600000}
+
+eureka:
+  client:
+    enabled: ${ENABLE_EUREKA:false}
+    service-url:
+      defaultZone: ${EUREKA_URI:http://eureka:8761/eureka}
+  instance:
+    prefer-ip-address: true
+    hostname: ${HOSTNAME:user-service}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    se.magnus: DEBUG
+    reactor: DEBUG

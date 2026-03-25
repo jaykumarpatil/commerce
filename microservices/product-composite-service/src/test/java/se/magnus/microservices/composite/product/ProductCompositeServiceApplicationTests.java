@@ -89,6 +89,25 @@ class ProductCompositeServiceApplicationTests {
       .jsonPath("$.message").isEqualTo("INVALID: " + PRODUCT_ID_INVALID);
   }
 
+  @Test
+  void createAndDeleteProductCompositeViaApi() {
+
+    ProductAggregate aggregate = new ProductAggregate(PRODUCT_ID_OK, "name", 1,
+      singletonList(new RecommendationSummary(PRODUCT_ID_OK, 1, "author", 1, "content")),
+      singletonList(new ReviewSummary(PRODUCT_ID_OK, 1, "author", "subject", "content")),
+      null);
+
+    client.post().uri("/product-composite")
+      .contentType(APPLICATION_JSON)
+      .bodyValue(aggregate)
+      .exchange()
+      .expectStatus().isAccepted();
+
+    client.delete().uri("/product-composite/" + PRODUCT_ID_OK)
+      .exchange()
+      .expectStatus().isAccepted();
+  }
+
   private WebTestClient.BodyContentSpec getAndVerifyProduct(int productId, HttpStatus expectedStatus) {
     return client.get()
       .uri("/product-composite/" + productId)

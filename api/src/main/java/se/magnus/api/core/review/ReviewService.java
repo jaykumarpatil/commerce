@@ -7,7 +7,11 @@ import reactor.core.publisher.Mono;
 
 public interface ReviewService {
 
-  Mono<Review> createReview(Review body);
+  @PostMapping(
+    value = "/review",
+    consumes = "application/json",
+    produces = "application/json")
+  Mono<Review> createReview(@RequestBody Review body);
 
   /**
    * Sample usage: "curl $HOST:$PORT/review?productId=1".
@@ -22,5 +26,6 @@ public interface ReviewService {
     @RequestHeader HttpHeaders headers,
     @RequestParam(value = "productId", required = true) int productId);
 
-  Mono<Void> deleteReviews(int productId);
+  @DeleteMapping(value = "/review")
+  Mono<Void> deleteReviews(@RequestParam(value = "productId", required = true) int productId);
 }

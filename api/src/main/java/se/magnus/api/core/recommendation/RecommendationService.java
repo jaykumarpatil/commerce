@@ -7,7 +7,11 @@ import reactor.core.publisher.Mono;
 
 public interface RecommendationService {
 
-  Mono<Recommendation> createRecommendation(Recommendation body);
+  @PostMapping(
+    value = "/recommendation",
+    consumes = "application/json",
+    produces = "application/json")
+  Mono<Recommendation> createRecommendation(@RequestBody Recommendation body);
 
   /**
    * Sample usage: "curl $HOST:$PORT/recommendation?productId=1".
@@ -22,5 +26,6 @@ public interface RecommendationService {
     @RequestHeader HttpHeaders headers,
     @RequestParam(value = "productId", required = true) int productId);
 
-  Mono<Void> deleteRecommendations(int productId);
+  @DeleteMapping(value = "/recommendation")
+  Mono<Void> deleteRecommendations(@RequestParam(value = "productId", required = true) int productId);
 }

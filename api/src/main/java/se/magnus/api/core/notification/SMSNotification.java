@@ -1,0 +1,14 @@
+package se.magnus.api.core.notification;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SMSNotification {
+    private String to;
+    private String from;
+    private String body;
+}
