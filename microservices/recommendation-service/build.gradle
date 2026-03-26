@@ -36,6 +36,16 @@ dependencies {
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     implementation 'io.micrometer:micrometer-registry-prometheus'
+    // OpenTelemetry support
+    implementation 'io.opentelemetry:opentelemetry-api'
+    implementation 'io.opentelemetry:opentelemetry-sdk'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+    // Jaeger tracing
+    implementation 'io.jaegertracing:jaeger-client'
+    // OpenAPI documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0'
+    // Jaeger tracing
+    implementation 'io.jaegertracing:jaeger-client'
 
     compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"

@@ -13,13 +13,28 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-    implementation "org.springframework.security:spring-security-oauth2-authorization-server:1.0.0"
     implementation 'io.micrometer:micrometer-registry-prometheus'
+    // OpenTelemetry support
+    implementation 'io.opentelemetry:opentelemetry-api'
+    implementation 'io.opentelemetry:opentelemetry-sdk'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+    // Jaeger tracing
+    implementation 'io.jaegertracing:jaeger-client'
+    // OpenAPI documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0'
+    implementation "org.springframework.security:spring-security-oauth2-authorization-server:1.0.0"
+    // OpenTelemetry support
+    implementation 'io.opentelemetry:opentelemetry-api'
+    implementation 'io.opentelemetry:opentelemetry-sdk'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+    // Jaeger tracing
+    implementation 'io.jaegertracing:jaeger-client'
+    implementation "org.springframework.security:spring-security-oauth2-authorization-server:1.0.0"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

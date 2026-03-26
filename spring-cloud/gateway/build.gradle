@@ -29,6 +29,22 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     implementation 'org.springframework.retry:spring-retry'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    // OpenTelemetry support
+    implementation 'io.opentelemetry:opentelemetry-api'
+    implementation 'io.opentelemetry:opentelemetry-sdk'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+    // Jaeger tracing
+    implementation 'io.jaegertracing:jaeger-client'
+    // OpenAPI documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    // OpenTelemetry support
+    implementation 'io.opentelemetry:opentelemetry-api'
+    implementation 'io.opentelemetry:opentelemetry-sdk'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+    // Jaeger tracing
+    implementation 'io.jaegertracing:jaeger-client'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
