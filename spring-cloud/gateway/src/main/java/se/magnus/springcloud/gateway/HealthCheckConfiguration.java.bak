@@ -7,7 +7,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.health.*;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.ReactiveHealthContributor;
+import org.springframework.boot.actuate.health.ReactiveHealthIndicator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -36,15 +38,15 @@ public class HealthCheckConfiguration {
     registry.put("product-composite", () -> getHealth("http://product-composite:4004"));
     registry.put("auth-server",       () -> getHealth("http://auth-server:4004"));
 
-    return CompositeReactiveHealthContributor.fromMap(registry);
+    return ReactiveHealthContributor.fromMap(registry);
   }
 
   private Mono<Health> getHealth(String baseUrl) {
     String url = baseUrl + "/actuator/health";
     LOG.debug("Setting up a call to the Health API on URL: {}", url);
     return webClient.get().uri(url).retrieve().bodyToMono(String.class)
-      .map(s -> new Health.Builder().up().build())
-      .onErrorResume(ex -> Mono.just(new Health.Builder().down(ex).build()))
+      .map(s -> Health.up().build())
+      .onErrorResume(ex -> Mono.just(Health.down(ex).build()))
       .log(LOG.getName(), FINE);
   }
 

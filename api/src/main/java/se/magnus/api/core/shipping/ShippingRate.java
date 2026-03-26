@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class ShippingRate {
     private String rateId;
     private String orderId;
+    private Double weight;
     private Double basePrice;
     private Double weightPrice;
     private Double distancePrice;

@@ -7,17 +7,10 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import se.magnus.microservices.core.user.services.JwtTokenProvider;
 
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
-
-    private final JwtTokenProvider jwtTokenProvider;
-
-    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -32,11 +25,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/v1/users/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(new JwtAuthenticationConverter(jwtTokenProvider))
-                        )
-                );
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }

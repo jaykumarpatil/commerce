@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -23,11 +22,13 @@ import se.magnus.api.core.review.Review;
 import se.magnus.api.exceptions.InvalidInputException;
 import se.magnus.api.exceptions.NotFoundException;
 import se.magnus.microservices.composite.product.services.ProductCompositeIntegration;
+import se.magnus.api.composite.product.ProductAggregate;
+import se.magnus.api.composite.product.RecommendationSummary;
+import se.magnus.api.composite.product.ReviewSummary;
 
 @DisabledInNativeImage
 @SpringBootTest(
   webEnvironment = RANDOM_PORT,
-  classes = {TestSecurityConfig.class},
   properties = {
     "spring.security.oauth2.resourceserver.jwt.issuer-uri=",
     "spring.main.allow-bean-definition-overriding=true"})
@@ -40,7 +41,7 @@ class ProductCompositeServiceApplicationTests {
   @Autowired
   private WebTestClient client;
 
-  @MockBean
+  @Autowired
   private ProductCompositeIntegration compositeIntegration;
 
   @BeforeEach
@@ -93,8 +94,8 @@ class ProductCompositeServiceApplicationTests {
   void createAndDeleteProductCompositeViaApi() {
 
     ProductAggregate aggregate = new ProductAggregate(PRODUCT_ID_OK, "name", 1,
-      singletonList(new RecommendationSummary(PRODUCT_ID_OK, 1, "author", 1, "content")),
-      singletonList(new ReviewSummary(PRODUCT_ID_OK, 1, "author", "subject", "content")),
+      singletonList(new RecommendationSummary(1, "author", 1, "content")),
+      singletonList(new ReviewSummary(1, "author", "subject", "content")),
       null);
 
     client.post().uri("/product-composite")

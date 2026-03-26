@@ -1,0 +1,134 @@
+groups:
+  - name: service_alerts
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "{{ $labels.instance }} has error rate of {{ $value }} errors/s"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency detected"
+          description: "{{ $labels.instance }} p95 latency is {{ $value }}s"
+
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.job }} is not responding"
+
+      - alert: HighMemoryUsage
+        expr: jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "{{ $labels.instance }} memory usage is {{ $value | humanizePercentage }}"
+
+      - alert: HighCPUUsage
+        expr: system_cpu_usage > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "{{ $labels.instance }} CPU usage is {{ $value | humanizePercentage }}"
+
+  - name: business_alerts
+    interval: 60s
+    rules:
+      - alert: HighOrderFailureRate
+        expr: rate(orders_failed_total[5m]) / rate(orders_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High order failure rate"
+          description: "Order failure rate is {{ $value | humanizePercentage }}"
+
+      - alert: HighPaymentFailureRate
+        expr: rate(payments_failed_total[5m]) / rate(payments_total[5m]) > 0.02
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High payment failure rate"
+          description: "Payment failure rate is {{ $value | humanizePercentage }}"
+
+      - alert: LowInventory
+        expr: inventory_available_quantity < 10
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low inventory alert"
+          description: "Product {{ $labels.product_id }} in warehouse {{ $labels.warehouse_id }} has only {{ $value }} units"
+
+  - name: infrastructure_alerts
+    interval: 30s
+    rules:
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis instance is not responding"
+
+      - alert: DatabaseDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL instance is not responding"
+
+      - alert: RabbitMQDown
+        expr: rabbitmq_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "RabbitMQ is down"
+          description: "RabbitMQ instance is not responding"
+
+  - name: slo_alerts
+    interval: 60s
+    rules:
+      - alert: SLOServiceLevelObjectiveErrorBudgetBurn
+        expr: |
+          1 - (
+            sum(rate(http_server_requests_seconds_count{status!~"5.."}[1h])) /
+            sum(rate(http_server_requests_seconds_count[1h]))
+          ) < 0.95
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SLO Error Budget Burning"
+          description: "Service is consuming error budget faster than expected"
+
+      - alert: LatencySLOBudgetBurn
+        expr: |
+          histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[1h])) > 2
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SLO Latency Budget Burning"
+          description: "95th percentile latency exceeds SLO target"

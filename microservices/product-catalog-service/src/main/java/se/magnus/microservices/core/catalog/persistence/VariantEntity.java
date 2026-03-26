@@ -21,4 +21,6 @@ public class VariantEntity {
     private Integer stockQuantity;
     private boolean active;
     private String attributesJson;
+    private String createdAt;
+    private String updatedAt;
 }

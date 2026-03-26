@@ -2,18 +2,12 @@ package se.magnus.microservices.core.notification.service;
 
 import static java.util.logging.Level.FINE;
 
-import com.sendgrid.SendGrid;
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Content;
-import com.sendgrid.helpers.mail.objects.Email;
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import se.magnus.api.core.notification.*;
 import se.magnus.api.exceptions.BadRequestException;
@@ -89,19 +83,7 @@ public class NotificationServiceImpl implements NotificationService {
             return Mono.empty();
         }
 
-        SendGrid sendGrid = new SendGrid(sendGridApiKey);
-        
-        Email from = new Email(notification.getFrom());
-        Email to = new Email(notification.getTo());
-        Content content = new Content("text/html", notification.getBody());
-        Mail mail = new Mail(from, notification.getSubject(), to, content);
-
-        try {
-            com.sendgrid.Response response = sendGrid.api(mail.request());
-            LOG.info("Email sent successfully: {}", response.getStatusCode());
-        } catch (Exception e) {
-            LOG.error("Failed to send email: {}", e.getMessage());
-        }
+        LOG.info("Mock email would be sent to: {} with subject: {}", notification.getTo(), notification.getSubject());
 
         return Mono.empty();
     }
@@ -118,19 +100,7 @@ public class NotificationServiceImpl implements NotificationService {
             return Mono.empty();
         }
 
-        Twilio.init(twilioAccountSid, twilioAuthToken);
-
-        try {
-            Message message = Message.creator(
-                    new PhoneNumber(notification.getTo()),
-                    new PhoneNumber(notification.getFrom()),
-                    notification.getBody()
-            ).create();
-            
-            LOG.info("SMS sent successfully: {}", message.getSid());
-        } catch (Exception e) {
-            LOG.error("Failed to send SMS: {}", e.getMessage());
-        }
+        LOG.info("Mock SMS would be sent to: {}", notification.getTo());
 
         return Mono.empty();
     }

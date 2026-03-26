@@ -385,11 +385,88 @@ services:
     mem_limit: 256m
     ports:
       - "6379:6379"
+    command: redis-server --appendonly yes --save 900 1 --save 300 10 --save 60 10000
+    volumes:
+      - redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 2s
       retries: 60
+
+  redis-cluster:
+    image: redis:7-alpine
+    restart: always
+    mem_limit: 256m
+    ports:
+      - "6380:6380"
+    command: >
+      redis-server --cluster-enabled yes 
+      --cluster-config-file nodes.conf 
+      --cluster-node-timeout 5000 
+      --appendonly yes
+    volumes:
+      - redis-cluster-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "INFO", "cluster"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    restart: always
+    mem_limit: 1g
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=ecommerce-search
+      - action.auto_create_index=true
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  elasticsearch-cluster:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    restart: always
+    mem_limit: 1g
+    environment:
+      - discovery.type=multi-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=ecommerce-search-cluster
+      - node.name=es-${NODE_ID:-1}
+      - cluster.initial_master_nodes=es-1,es-2,es-3
+      - action.auto_create_index=true
+    volumes:
+      - es-cluster-data:/usr/share/elasticsearch/data
+    networks:
+      - backend
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.0
+    restart: always
+    mem_limit: 512m
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   jaeger-collector.istio-system:
     image: openzipkin/zipkin:2.24.0
@@ -399,3 +476,13 @@ services:
       - STORAGE_TYPE=mem
     ports:
       - 9411:9411
+
+volumes:
+  redis-data:
+  redis-cluster-data:
+  es-data:
+  es-cluster-data:
+
+networks:
+  backend:
+    driver: bridge

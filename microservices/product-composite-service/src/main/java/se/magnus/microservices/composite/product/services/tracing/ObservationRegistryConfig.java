@@ -1,12 +1,13 @@
 package se.magnus.microservices.composite.product.services.tracing;
 
 import io.micrometer.observation.ObservationRegistry;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationRegistryCustomizer;
+import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
-public class ObservationRegistryConfig implements ObservationRegistryCustomizer<ObservationRegistry> {
+public class ObservationRegistryConfig {
 
   private final BuildProperties buildProperties;
 
@@ -14,8 +15,15 @@ public class ObservationRegistryConfig implements ObservationRegistryCustomizer<
     this.buildProperties = buildProperties;
   }
 
-  @Override
-  public void customize(final ObservationRegistry registry) {
-    registry.observationConfig().observationFilter(new BuildInfoObservationFilter(buildProperties));
+  @Bean
+  public ObservationRegistryCustomizer observationRegistryCustomizer() {
+    return registry -> {
+      registry.observationConfig().observationFilter(new BuildInfoObservationFilter(buildProperties));
+    };
+  }
+
+  @FunctionalInterface
+  public interface ObservationRegistryCustomizer<T extends ObservationRegistry> {
+    void customize(T registry);
   }
 }

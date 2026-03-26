@@ -100,7 +100,7 @@ public class AuthorizationServerConfig {
       .exceptionHandling(exceptions ->
         exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
       )
-      .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+      .httpBasic(Customizer.withDefaults());
 
     return http.build();
   }

@@ -37,7 +37,6 @@ import se.magnus.api.event.Event;
 @DisabledInNativeImage
 @SpringBootTest(
   webEnvironment = RANDOM_PORT,
-  classes = {TestSecurityConfig.class},
   properties = {
     "spring.security.oauth2.resourceserver.jwt.issuer-uri=",
     "spring.main.allow-bean-definition-overriding=true",

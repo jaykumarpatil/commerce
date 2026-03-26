@@ -1,0 +1,135 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/ecommerce
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: ghcr-secret
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/canary: "true"
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: api-tls
+      hosts:
+        - api.example.com
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8080
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+config:
+  spring:
+    profiles:
+      active: kubernetes
+    rabbitmq:
+      host: rabbitmq
+      port: 5672
+    data:
+      mongodb:
+        host: mongodb
+        port: 27017
+      redis:
+        host: redis
+        port: 6379
+      r2dbc:
+        host: postgres
+        port: 5432
+
+env:
+  JAVA_OPTS: >-
+    -XX:MaxRAMPercentage=75.0
+    -XX:+UseG1GC
+    -XX:+HeapDumpOnOutOfMemoryError
+    -Djava.security.egd=file:/dev/./urandom
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+
+tracing:
+  enabled: true
+  samplingRate: 0.1
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    access-token-expiry-ms: 86400000
+    refresh-token-expiry-ms: 604800000
+
+persistence:
+  enabled: true
+  storageClass: standard-ssd
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+serviceAccount:
+  create: true
+  name: ecommerce-sa
+  annotations:
+    iam.gke.io/gcp-service-account: ecommerce-sa@project.iam.gserviceaccount.com
+
+networkPolicy:
+  enabled: true
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379

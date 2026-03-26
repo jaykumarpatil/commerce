@@ -1,28 +1,27 @@
 plugins {
-    id 'org.springframework.boot' version '3.0.5'
-    id 'io.spring.dependency-management' version '1.1.0'
-    id 'org.graalvm.buildtools.native' version '0.9.18'
+    id 'org.springframework.boot' version '4.0.4'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 group = 'se.magnus.microservices.core.recommendation'
 version = '1.0.0-SNAPSHOT'
-sourceCompatibility = '17'
+
 
 ext {
-    mapstructVersion = "1.5.3.Final"
-    springCloudVersion = "2022.0.1"
+    mapstructVersion = "1.6.3"
+    springCloudVersion = "2025.1.1"
 }
 
 repositories {
     mavenCentral()
 }
-
-// Prevents GraalVM to native compile locally, i.e. without Docker-buildpacks
-// See https://github.com/spring-projects/spring-boot/issues/33238
-//jar {
-//    enabled = false
-//}
 
 dependencies {
     implementation project(':api')
@@ -32,20 +31,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
     implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
     implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
-    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     implementation 'io.micrometer:micrometer-registry-prometheus'
     // OpenTelemetry support
-    implementation 'io.opentelemetry:opentelemetry-api'
-    implementation 'io.opentelemetry:opentelemetry-sdk'
-    implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
     // Jaeger tracing
-    implementation 'io.jaegertracing:jaeger-client'
+    implementation 'io.jaegertracing:jaeger-client:1.8.1'
     // OpenAPI documentation
-    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0'
-    // Jaeger tracing
-    implementation 'io.jaegertracing:jaeger-client'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.16'
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 
     compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
@@ -56,9 +49,10 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', classifier: 'osx-aarch_64'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     testImplementation 'io.projectreactor:reactor-test'
 
-    implementation platform('org.testcontainers:testcontainers-bom:1.17.6')
+    implementation platform('org.testcontainers:testcontainers-bom:1.20.4')
     testImplementation 'org.testcontainers:testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:mongodb'

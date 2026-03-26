@@ -10,7 +10,7 @@ Multi-module Gradle project implementing a microservice landscape using Spring B
 
 ```bash
 # Requires Java 17
-JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home
+JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home
 
 # Build all modules
 ./gradlew build

@@ -1,19 +1,21 @@
 package se.magnus.microservices.core.inventory.service;
 
-import static java.util.logging.Level.FINE;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import se.magnus.api.core.inventory.*;
+import se.magnus.api.core.inventory.InventoryItem;
+import se.magnus.api.core.inventory.InventoryService;
+import se.magnus.api.core.inventory.StockReservation;
 import se.magnus.api.exceptions.BadRequestException;
-import se.magnus.api.exceptions.InvalidInputException;
 import se.magnus.api.exceptions.NotFoundException;
 import se.magnus.microservices.core.inventory.persistence.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -25,7 +27,12 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryMapper inventoryMapper;
     private final StockReservationMapper reservationMapper;
 
-    @Autowired
+    @Value("${inventory.low-stock-threshold:10}")
+    private int lowStockThreshold;
+
+    @Value("${inventory.reservation.timeout-minutes:15}")
+    private int reservationTimeoutMinutes;
+
     public InventoryServiceImpl(InventoryRepository inventoryRepository,
                                StockReservationRepository reservationRepository,
                                InventoryMapper inventoryMapper,
@@ -53,52 +60,14 @@ public class InventoryServiceImpl implements InventoryService {
     public Mono<StockReservation> reserveStock(String productId, Integer quantity) {
         return inventoryRepository.findByProductId(productId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Inventory not found for product: " + productId)))
-                .flatMap(entity -> {
-                    if (entity.getAvailableQuantity() < quantity) {
-                        return Mono.error(new BadRequestException("Insufficient stock. Available: " + entity.getAvailableQuantity() + ", Requested: " + quantity));
-                    }
-                    
-                    // Update inventory
-                    entity.setAvailableQuantity(entity.getAvailableQuantity() - quantity);
-                    entity.setReservedQuantity(entity.getReservedQuantity() + quantity);
-                    
-                    // Create reservation
-                    StockReservationEntity reservation = new StockReservationEntity();
-                    reservation.setReservationId(java.util.UUID.randomUUID().toString());
-                    reservation.setOrderId(null); // Will be set when order is confirmed
-                    reservation.setProductId(productId);
-                    reservation.setQuantity(quantity);
-                    reservation.setStatus("PENDING");
-                    reservation.setReservedAt(java.time.LocalDateTime.now());
-                    
-                    return Mono.zip(
-                            inventoryRepository.save(entity),
-                            reservationRepository.save(reservation)
-                    ).map(tuple -> {
-                        entity = tuple.getT1();
-                        reservation = tuple.getT2();
-                        return reservationMapper.entityToApi(reservation);
-                    });
-                })
-                .log(LOG.getName(), FINE);
+                .flatMap(entity -> reserveFromEntity(entity, quantity));
     }
 
     @Override
     public Mono<StockReservation> confirmReservation(String reservationId) {
         return reservationRepository.findByReservationId(reservationId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Reservation not found: " + reservationId)))
-                .flatMap(entity -> {
-                    if (!"PENDING".equals(entity.getStatus())) {
-                        return Mono.error(new BadRequestException("Reservation already " + entity.getStatus()));
-                    }
-                    
-                    entity.setStatus("CONFIRMED");
-                    entity.setConfirmedAt(java.time.LocalDateTime.now());
-                    
-                    return reservationRepository.save(entity)
-                            .log(LOG.getName(), FINE)
-                            .map(reservationMapper::entityToApi);
-                });
+                .flatMap(this::confirmReservationEntity);
     }
 
     @Override
@@ -109,38 +78,15 @@ public class InventoryServiceImpl implements InventoryService {
                     if (!"PENDING".equals(entity.getStatus())) {
                         return Mono.error(new BadRequestException("Reservation already " + entity.getStatus()));
                     }
-                    
-                    // Release reserved stock
-                    return inventoryRepository.findByProductId(entity.getProductId())
-                            .switchIfEmpty(Mono.error(new NotFoundException("Inventory not found for product: " + entity.getProductId())))
-                            .flatMap(inventoryEntity -> {
-                                inventoryEntity.setReservedQuantity(inventoryEntity.getReservedQuantity() - entity.getQuantity());
-                                inventoryEntity.setAvailableQuantity(inventoryEntity.getAvailableQuantity() + entity.getQuantity());
-                                
-                                entity.setStatus("CANCELLED");
-                                entity.setCancelledAt(java.time.LocalDateTime.now());
-                                
-                                return Mono.zip(
-                                        inventoryRepository.save(inventoryEntity),
-                                        reservationRepository.save(entity)
-                                ).map(tuple -> reservationMapper.entityToApi(entity));
-                            });
-                })
-                .log(LOG.getName(), FINE);
+                    return releaseReservation(entity);
+                });
     }
 
     @Override
     public Mono<InventoryItem> adjustStock(String productId, Integer quantity) {
         return inventoryRepository.findByProductId(productId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Inventory not found for product: " + productId)))
-                .flatMap(entity -> {
-                    entity.setTotalQuantity(entity.getTotalQuantity() + quantity);
-                    entity.setAvailableQuantity(entity.getAvailableQuantity() + quantity);
-                    
-                    return inventoryRepository.save(entity)
-                            .log(LOG.getName(), FINE)
-                            .map(inventoryMapper::entityToApi);
-                });
+                .flatMap(entity -> adjustInventory(entity, quantity));
     }
 
     @Override
@@ -149,15 +95,11 @@ public class InventoryServiceImpl implements InventoryService {
                 .switchIfEmpty(Mono.error(new NotFoundException("Inventory not found for product: " + productId)))
                 .flatMap(entity -> {
                     if (entity.getReservedQuantity() < quantity) {
-                        return Mono.error(new BadRequestException("Insufficient reserved stock. Reserved: " + entity.getReservedQuantity() + ", Release: " + quantity));
+                        return Mono.error(new BadRequestException("Insufficient reserved stock"));
                     }
-                    
                     entity.setReservedQuantity(entity.getReservedQuantity() - quantity);
                     entity.setAvailableQuantity(entity.getAvailableQuantity() + quantity);
-                    
-                    return inventoryRepository.save(entity)
-                            .log(LOG.getName(), FINE)
-                            .then(Mono.empty());
+                    return inventoryRepository.save(entity).then();
                 });
     }
 
@@ -165,5 +107,75 @@ public class InventoryServiceImpl implements InventoryService {
     public Flux<StockReservation> getReservationsByOrderId(String orderId) {
         return reservationRepository.findByOrderId(orderId)
                 .map(reservationMapper::entityToApi);
+    }
+
+    public Flux<InventoryItem> getLowStockItems() {
+        return inventoryRepository.findAll()
+                .filter(entity -> entity.getAvailableQuantity() <= lowStockThreshold)
+                .map(inventoryMapper::entityToApi);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void processExpiredReservations() {
+    }
+
+    @Scheduled(fixedRate = 300000)
+    public void checkLowStockAlerts() {
+        getLowStockItems()
+                .filter(item -> item.getAvailableQuantity() <= lowStockThreshold)
+                .subscribe(item -> LOG.warn("Low stock alert: Product {} has only {} units available", 
+                        item.getProductId(), item.getAvailableQuantity()));
+    }
+
+    private Mono<StockReservation> reserveFromEntity(InventoryEntity entity, int quantity) {
+        if (entity.getAvailableQuantity() < quantity) {
+            return Mono.error(new BadRequestException("Insufficient stock"));
+        }
+        
+        entity.setAvailableQuantity(entity.getAvailableQuantity() - quantity);
+        entity.setReservedQuantity(entity.getReservedQuantity() + quantity);
+        
+        StockReservationEntity reservation = new StockReservationEntity();
+        reservation.setReservationId(UUID.randomUUID().toString());
+        reservation.setProductId(entity.getProductId());
+        reservation.setQuantity(quantity);
+        reservation.setStatus("PENDING");
+        reservation.setReservedAt(java.time.LocalDateTime.now());
+        
+        return Mono.zip(inventoryRepository.save(entity), reservationRepository.save(reservation))
+                .map(tuple -> reservationMapper.entityToApi(tuple.getT2()));
+    }
+
+    private Mono<StockReservation> confirmReservationEntity(StockReservationEntity entity) {
+        if (!"PENDING".equals(entity.getStatus())) {
+            return Mono.error(new BadRequestException("Reservation already " + entity.getStatus()));
+        }
+        
+        entity.setStatus("CONFIRMED");
+        entity.setConfirmedAt(java.time.LocalDateTime.now());
+        
+        return reservationRepository.save(entity)
+                .map(reservationMapper::entityToApi);
+    }
+
+    private Mono<StockReservation> releaseReservation(StockReservationEntity entity) {
+        return inventoryRepository.findByProductId(entity.getProductId())
+                .flatMap(inventory -> {
+                    inventory.setReservedQuantity(inventory.getReservedQuantity() - entity.getQuantity());
+                    inventory.setAvailableQuantity(inventory.getAvailableQuantity() + entity.getQuantity());
+                    return inventoryRepository.save(inventory);
+                })
+                .then(Mono.fromRunnable(() -> {
+                    entity.setStatus("CANCELLED");
+                    entity.setCancelledAt(java.time.LocalDateTime.now());
+                }))
+                .then(reservationRepository.save(entity))
+                .map(reservationMapper::entityToApi);
+    }
+
+    private Mono<InventoryItem> adjustInventory(InventoryEntity entity, int quantity) {
+        entity.setTotalQuantity(entity.getTotalQuantity() + quantity);
+        entity.setAvailableQuantity(entity.getAvailableQuantity() + quantity);
+        return inventoryRepository.save(entity).map(inventoryMapper::entityToApi);
     }
 }

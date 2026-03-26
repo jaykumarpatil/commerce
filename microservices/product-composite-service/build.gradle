@@ -1,27 +1,26 @@
 plugins {
-    id 'org.springframework.boot' version '3.0.5'
-    id 'io.spring.dependency-management' version '1.1.0'
-    id 'org.graalvm.buildtools.native' version '0.9.18'
+    id 'org.springframework.boot' version '4.0.4'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 group = 'se.magnus.microservices.composite.product'
 version = '1.0.0-SNAPSHOT'
-sourceCompatibility = '17'
+
 
 ext {
-    springCloudVersion = "2022.0.1"
-    resilience4jVersion = "2.0.2"
+    springCloudVersion = "2025.1.1"
+    resilience4jVersion = "2.2.0"
 }
 repositories {
     mavenCentral()
 }
-
-// Prevents GraalVM to native compile locally, i.e. without Docker-buildpacks
-// See https://github.com/spring-projects/spring-boot/issues/33238
-//jar {
-//    enabled = false
-//}
 
 springBoot {
     buildInfo()
@@ -37,28 +36,26 @@ dependencies {
     implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
     implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
-    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-    implementation 'org.springframework.retry:spring-retry'
-    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0'
-    implementation "io.github.resilience4j:resilience4j-spring-boot3:${resilience4jVersion}"
-    implementation "io.github.resilience4j:resilience4j-reactor:${resilience4jVersion}"
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'io.micrometer:micrometer-registry-prometheus'
     // OpenTelemetry support
-    implementation 'io.opentelemetry:opentelemetry-api'
-    implementation 'io.opentelemetry:opentelemetry-sdk'
-    implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
     // Jaeger tracing
-    implementation 'io.jaegertracing:jaeger-client'
+    implementation 'io.jaegertracing:jaeger-client:1.8.1'
+    // OpenAPI documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.16'
+    // Resilience4j
+    implementation "io.github.resilience4j:resilience4j-spring-boot3:${resilience4jVersion}"
+    implementation "io.github.resilience4j:resilience4j-reactor:${resilience4jVersion}"
 
     // To avoid the following error message on Apple silicon (for details, see https://github.com/netty/netty/issues/11693):
     // Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS.
     implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', classifier: 'osx-aarch_64'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.cloud:spring-cloud-stream-test-binder'
     testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.mockito:mockito-core'
 }
 
 dependencyManagement {
@@ -70,13 +67,6 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
-    // Tracing agent works with the prod-comp service, but is disabled to avoid changes to the source code, i.e. src/main/resources/META-INF/native-image
-    // jvmArgs "-agentlib:native-image-agent=access-filter-file=src/test/resources/access-filter.json,config-output-dir=src/main/resources/META-INF/native-image"
-
-//    testLogging {
-//        outputs.upToDateWhen {false}
-//        showStandardStreams = true
-//    }
 }
 
 tasks.named('bootBuildImage') {

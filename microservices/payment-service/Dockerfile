@@ -1,5 +1,5 @@
 # Payment Service Dockerfile
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 WORKDIR /app
 

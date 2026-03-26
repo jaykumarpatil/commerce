@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: elasticsearch-config
+  
+  elasticsearch:
+    uris: http://elasticsearch:9200
+    
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+
+server:
+  port: 9200
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+elasticsearch:
+  index:
+    products:
+      name: products
+      shards: 3
+      replicas: 1
+    categories:
+      name: categories
+      shards: 1
+      replicas: 1
+    search-suggestions:
+      name: search-suggestions
+      shards: 2
+      replicas: 1
+      
+  ilm:
+    policy:
+      hot:
+        min_age: 0ms
+        actions:
+          rollover:
+            max_age: 7d
+            max_size: 50gb
+      delete:
+        min_age: 30d
+        actions:
+          delete: {}
+
+  search:
+    completion:
+      suggester:
+        context:
+          category:
+            type: category
+          popularity:
+            type: numeric

@@ -12,4 +12,5 @@ public class LoginResponse {
     private String refreshToken;
     private long expiresIn;
     private User user;
+    private String tokenType = "Bearer";
 }

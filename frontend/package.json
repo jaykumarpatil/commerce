@@ -1,0 +1,48 @@
+{
+  "name": "ecommerce-frontend",
+  "version": "1.0.0",
+  "description": "Modern e-commerce frontend with Angular 21",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "start:ssr": "ng serve --prerender",
+    "build": "ng build",
+    "build:ssr": "ng build && ng run ecommerce-frontend:server",
+    "build:prod": "ng build --configuration production",
+    "build:prod:ssr": "ng build --configuration production && ng run ecommerce-frontend:prerender",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "test:ci": "ng test --no-watch --no-progress",
+    "lint": "ng lint",
+    "serve:ssr": "node dist/ecommerce-frontend/server/server.mjs"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/platform-browser-dynamic": "^21.0.0",
+    "@angular/platform-server": "^21.0.0",
+    "@angular/router": "^21.0.0",
+    "@angular/service-worker": "^21.0.0",
+    "@angular/ssr": "^21.0.0",
+    "@nguniversal/express-engine": "^21.0.0",
+    "express": "^4.18.2",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.6.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^21.0.0",
+    "@angular/cli": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
+    "@types/node": "^22.0.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "typescript": "~5.6.0"
+  }
+}

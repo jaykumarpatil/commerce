@@ -1,0 +1,181 @@
+@use 'styles/variables' as *;
+@use 'styles/theme';
+@use 'styles/components';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// Import Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+// Component-specific styles
+@layer components {
+  // Layout
+  .page-container {
+    @apply min-h-screen flex flex-col;
+  }
+  
+  .main-content {
+    @apply flex-1 py-8;
+  }
+  
+  // Product Grid
+  .product-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
+  
+  // Cart Summary
+  .cart-summary {
+    @apply bg-dark-secondary border border-dark-border rounded-xl p-6;
+  }
+  
+  // Price Display
+  .price {
+    @apply text-xl font-semibold text-white;
+    
+    &-original {
+      @apply text-sm text-dark-500 line-through ml-2;
+    }
+    
+    &-sale {
+      @apply text-accent-primary;
+    }
+  }
+  
+  // Form Layout
+  .form-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+  }
+  
+  // Section Headers
+  .section-header {
+    @apply flex items-center justify-between mb-6;
+    
+    h2 {
+      @apply text-2xl font-bold text-white;
+    }
+  }
+  
+  // Empty State
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-16 text-center;
+    
+    &-icon {
+      @apply w-16 h-16 text-dark-500 mb-4;
+    }
+    
+    &-title {
+      @apply text-xl font-semibold text-white mb-2;
+    }
+    
+    &-description {
+      @apply text-dark-400 max-w-md;
+    }
+  }
+  
+  // Step Indicator (Checkout)
+  .step-indicator {
+    @apply flex items-center justify-center gap-4 mb-8;
+    
+    &-item {
+      @apply flex items-center gap-2;
+      
+      &-number {
+        @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold;
+        @apply bg-dark-tertiary text-dark-400;
+      }
+      
+      &-label {
+        @apply text-sm text-dark-400 hidden sm:block;
+      }
+      
+      &.active {
+        .step-indicator-item-number {
+          @apply bg-accent-primary text-white;
+        }
+        .step-indicator-item-label {
+          @apply text-white;
+        }
+      }
+      
+      &.completed {
+        .step-indicator-item-number {
+          @apply bg-accent-success text-white;
+        }
+      }
+    }
+    
+    &-line {
+      @apply w-12 h-0.5 bg-dark-border;
+      
+      &.completed {
+        @apply bg-accent-success;
+      }
+    }
+  }
+  
+  // Quantity Selector
+  .quantity-selector {
+    @apply flex items-center border border-dark-border rounded-lg;
+    
+    button {
+      @apply px-3 py-2 text-dark-400 hover:text-white transition-colors;
+      
+      &:first-child {
+        @apply border-r border-dark-border;
+      }
+      
+      &:last-child {
+        @apply border-l border-dark-border;
+      }
+    }
+    
+    input {
+      @apply w-12 text-center bg-transparent;
+    }
+  }
+  
+  // Checkbox & Radio Custom
+  .checkbox-custom,
+  .radio-custom {
+    @apply w-5 h-5 border-2 border-dark-border rounded cursor-pointer transition-all;
+    @apply checked:bg-accent-primary checked:border-accent-primary;
+    @apply focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 focus:ring-offset-dark-bg-primary;
+  }
+  
+  .radio-custom {
+    @apply rounded-full;
+  }
+}
+
+// Custom component animations
+@layer utilities {
+  .transition-base {
+    transition: all 200ms ease;
+  }
+  
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1;
+  }
+  
+  .hover-glow {
+    @apply transition-shadow duration-200 hover:shadow-glow;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-primary;
+  }
+}
+
+// Responsive visibility utilities
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}

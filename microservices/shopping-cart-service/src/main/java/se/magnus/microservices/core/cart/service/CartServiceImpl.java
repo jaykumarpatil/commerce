@@ -66,11 +66,10 @@ public class CartServiceImpl implements CartService {
     @Override
     public Mono<Cart> getCartByUserId(String userId) {
         return cartRepository.findByUserId(userId)
-                .switchIfEmpty(Mono.defer(() -> {
-                    // Create new cart for user if none exists
+                .<CartEntity>switchIfEmpty(Mono.defer(() -> {
                     Cart newCart = new Cart();
                     newCart.setUserId(userId);
-                    return createCart(newCart);
+                    return cartRepository.save(cartMapper.apiToEntity(newCart));
                 }))
                 .map(cartMapper::entityToApi);
     }
@@ -80,12 +79,10 @@ public class CartServiceImpl implements CartService {
         return cartRepository.findByCartId(cartId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Cart not found: " + cartId)))
                 .flatMap(cartEntity -> {
-                    // Check if item already exists
                     boolean itemExists = cartEntity.getItems().stream()
                             .anyMatch(i -> i.getProductId().equals(item.getProductId()));
                     
                     if (itemExists) {
-                        // Update quantity
                         return Mono.error(new BadRequestException("Item already exists in cart"));
                     }
                     
@@ -93,11 +90,10 @@ public class CartServiceImpl implements CartService {
                     itemEntity.setCartItemId(java.util.UUID.randomUUID().toString());
                     
                     cartEntity.getItems().add(itemEntity);
-                    return calculateTotals(cartId, cartEntity);
-                })
-                .flatMap(cartRepository::save)
-                .log(LOG.getName(), FINE)
-                .map(cartMapper::entityToApi);
+                    return calculateTotals(cartId, cartEntity)
+                            .flatMap(cartRepository::save)
+                            .map(cartMapper::entityToApi);
+                });
     }
 
     @Override
@@ -114,11 +110,10 @@ public class CartServiceImpl implements CartService {
                     itemEntity.setCartItemId(itemId);
                     
                     cartEntity.getItems().set(itemIndex, itemEntity);
-                    return calculateTotals(cartId, cartEntity);
-                })
-                .flatMap(cartRepository::save)
-                .log(LOG.getName(), FINE)
-                .map(cartMapper::entityToApi);
+                    return calculateTotals(cartId, cartEntity)
+                            .flatMap(cartRepository::save)
+                            .map(cartMapper::entityToApi);
+                });
     }
 
     @Override
@@ -132,11 +127,10 @@ public class CartServiceImpl implements CartService {
                     }
                     
                     cartEntity.getItems().remove(itemIndex);
-                    return calculateTotals(cartId, cartEntity);
-                })
-                .flatMap(cartRepository::save)
-                .log(LOG.getName(), FINE)
-                .map(cartMapper::entityToApi);
+                    return calculateTotals(cartId, cartEntity)
+                            .flatMap(cartRepository::save)
+                            .map(cartMapper::entityToApi);
+                });
     }
 
     @Override
@@ -166,10 +160,12 @@ public class CartServiceImpl implements CartService {
     public Mono<Cart> calculateTotals(String cartId) {
         return cartRepository.findByCartId(cartId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Cart not found: " + cartId)))
-                .flatMap(this::calculateTotals);
+                .flatMap(cartEntity -> calculateTotals(cartId, cartEntity)
+                        .flatMap(cartRepository::save)
+                        .map(cartMapper::entityToApi));
     }
 
-    private Mono<Cart> calculateTotals(String cartId, CartEntity cartEntity) {
+    private Mono<CartEntity> calculateTotals(String cartId, CartEntity cartEntity) {
         double subtotal = 0;
         int itemCount = 0;
 
@@ -190,7 +186,7 @@ public class CartServiceImpl implements CartService {
         cartEntity.setItemTotalCount(itemCount);
         cartEntity.setUpdatedAt(java.time.ZonedDateTime.now().toString());
 
-        return Mono.just(cartMapper.entityToApi(cartEntity));
+        return Mono.just(cartEntity);
     }
 
     private int findItemIndex(CartEntity cartEntity, String itemId) {
