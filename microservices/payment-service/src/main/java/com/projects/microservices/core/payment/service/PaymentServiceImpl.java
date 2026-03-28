@@ -2,6 +2,8 @@ package com.projects.microservices.core.payment.service;
 
 import static java.util.logging.Level.FINE;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
@@ -29,14 +31,16 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
+    private final ObjectMapper objectMapper;
 
     @Value("${stripe.api-key:}")
     private String stripeApiKey;
 
     @Autowired
-    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentMapper paymentMapper) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentMapper paymentMapper, ObjectMapper objectMapper) {
         this.paymentRepository = paymentRepository;
         this.paymentMapper = paymentMapper;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -173,9 +177,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Mono<Void> handleWebhook(String payload, String signature) {
-        // TODO: Implement Stripe webhook handling
-        LOG.info("Received webhook payload: {}", payload);
-        return Mono.empty();
+        if (payload == null || payload.isBlank()) {
+            return Mono.error(new InvalidInputException("Webhook payload is required"));
+        }
+
+        return Mono.fromCallable(() -> objectMapper.readTree(payload))
+                .onErrorMap(ex -> new BadRequestException("Invalid webhook payload"))
+                .flatMap(this::handleWebhookEvent)
+                .then();
     }
 
     private Mono<Payment> createMockPayment(PaymentRequest request) {
@@ -193,5 +202,43 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.save(entity)
                 .log(LOG.getName(), FINE)
                 .map(paymentMapper::entityToApi);
+    }
+
+    private Mono<PaymentEntity> handleWebhookEvent(JsonNode eventNode) {
+        String transactionId = asText(eventNode.at("/data/object/id"));
+        String status = normalizeStatus(asText(eventNode.at("/data/object/status")));
+
+        if (transactionId == null || transactionId.isBlank()) {
+            return Mono.error(new BadRequestException("Webhook payload missing transaction ID"));
+        }
+
+        if (status == null || status.isBlank()) {
+            return Mono.error(new BadRequestException("Webhook payload missing payment status"));
+        }
+
+        return paymentRepository.findByTransactionId(transactionId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Payment not found for transaction: " + transactionId)))
+                .flatMap(entity -> {
+                    entity.setPaymentStatus(status);
+                    if ("FAILED".equals(status) && eventNode.at("/data/object/failure_message").isTextual()) {
+                        entity.setFailureReason(eventNode.at("/data/object/failure_message").asText());
+                    }
+                    return paymentRepository.save(entity).log(LOG.getName(), FINE);
+                });
+    }
+
+    private String asText(JsonNode node) {
+        return node != null && !node.isMissingNode() && !node.isNull() ? node.asText() : null;
+    }
+
+    private String normalizeStatus(String providerStatus) {
+        if (providerStatus == null) return null;
+        return switch (providerStatus.toLowerCase()) {
+            case "succeeded", "paid", "captured" -> "COMPLETED";
+            case "pending", "processing", "requires_action" -> "PENDING";
+            case "refunded", "partially_refunded" -> "REFUNDED";
+            case "failed", "canceled" -> "FAILED";
+            default -> providerStatus.toUpperCase();
+        };
     }
 }
