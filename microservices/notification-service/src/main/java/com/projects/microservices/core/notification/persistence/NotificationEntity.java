@@ -15,8 +15,8 @@ public class NotificationEntity {
     private Long id;
     private String notificationId;
     private String userId;
-    private String type; // EMAIL, SMS, PUSH
-    private String channel; // ORDER_CONFIRMATION, PAYMENT_SUCCESS, SHIPPING_UPDATE
+    private com.projects.api.core.notification.NotificationType type;
+    private com.projects.api.core.notification.NotificationChannel channel;
     private String subject;
     private String message;
     private String recipient;

@@ -65,6 +65,7 @@ public class ReviewServiceImpl implements ReviewService {
   public Mono<Review> createReview(Review body) {
     validateProductId(body.getProductId());
     validateUserId(body.getUserId());
+    validateRating(body.getRating());
 
     return ensureUserExists(body.getUserId())
       .then(ensureProductExists(body.getProductId()))
@@ -153,10 +154,10 @@ public class ReviewServiceImpl implements ReviewService {
     List<ReviewEntity> approvedReviews = repository.findByProductIdAndModerationStatus(productId, ModerationStatus.APPROVED);
 
     Map<Integer, Long> countByRating = approvedReviews.stream()
-      .collect(Collectors.groupingBy(ReviewEntity::getReviewId, Collectors.counting()));
+      .collect(Collectors.groupingBy(ReviewEntity::getRating, Collectors.counting()));
 
     double averageRating = approvedReviews.stream()
-      .mapToInt(ReviewEntity::getReviewId)
+      .mapToInt(ReviewEntity::getRating)
       .average()
       .orElse(0.0);
 
@@ -183,7 +184,31 @@ public class ReviewServiceImpl implements ReviewService {
 
   @Override
   public Mono<Review> updateReviewStatus(int productId, int reviewId, ReviewStatus status) {
-    return Mono.error(new InvalidInputException("Review status updates are not persisted yet. Requested status: " + status));
+    validateProductId(productId);
+    if (reviewId < 1) {
+      throw new InvalidInputException("Invalid reviewId: " + reviewId);
+    }
+    if (status == null) {
+      throw new InvalidInputException("Review status is required");
+    }
+
+    return Mono.fromCallable(() -> {
+      ReviewEntity entity = repository.findByProductIdAndReviewId(productId, reviewId)
+        .orElseThrow(() -> new NotFoundException("No review found for productId: " + productId + ", reviewId: " + reviewId));
+
+      entity.setStatus(status);
+      if (ReviewStatus.APPROVED.equals(status)) {
+        entity.setModerationStatus(ModerationStatus.APPROVED);
+      } else if (ReviewStatus.REJECTED.equals(status)) {
+        entity.setModerationStatus(ModerationStatus.REJECTED);
+      }
+      entity.setUpdatedAt(Instant.now());
+
+      ReviewEntity saved = repository.save(entity);
+      Review review = mapper.entityToApi(saved);
+      review.setServiceAddress(serviceUtil.getServiceAddress());
+      return review;
+    }).subscribeOn(jdbcScheduler);
   }
 
   @Override
@@ -200,6 +225,12 @@ public class ReviewServiceImpl implements ReviewService {
   private void validateProductId(int productId) {
     if (productId < 1) {
       throw new InvalidInputException("Invalid productId: " + productId);
+    }
+  }
+
+  private void validateRating(int rating) {
+    if (rating < 1 || rating > 5) {
+      throw new InvalidInputException("Invalid rating, expected range 1..5 but was: " + rating);
     }
   }
 

@@ -2,6 +2,7 @@ package com.projects.microservices.core.recommendation.services;
 
 import com.projects.api.core.recommendation.Recommendation;
 import com.projects.microservices.core.recommendation.persistence.RecommendationEntity;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,10 @@ public class RecommendationMapper {
         entity.getAuthor(),
         entity.getRating(),
         entity.getContent(),
+        entity.getUserId(),
+        entity.getPersonalizationScore(),
+        entity.getScoreReason(),
+        entity.getGeneratedAt(),
         null);
   }
 
@@ -30,7 +35,11 @@ public class RecommendationMapper {
         api.getRecommendationId(),
         api.getAuthor(),
         api.getRate(),
-        api.getContent());
+        api.getContent(),
+        api.getUserId(),
+        api.getPersonalizationScore(),
+        api.getScoreReason(),
+        api.getGeneratedAt() == null ? Instant.now() : api.getGeneratedAt());
   }
 
   public List<Recommendation> entityListToApiList(List<RecommendationEntity> entityList) {

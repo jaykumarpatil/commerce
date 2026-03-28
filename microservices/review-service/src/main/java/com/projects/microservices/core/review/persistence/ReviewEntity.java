@@ -2,6 +2,8 @@ package com.projects.microservices.core.review.persistence;
 
 import static java.lang.String.format;
 
+import com.projects.api.core.review.ModerationStatus;
+import com.projects.api.core.review.ReviewStatus;
 import jakarta.persistence.*;
 import java.time.Instant;
 
@@ -24,9 +26,13 @@ public class ReviewEntity {
   private String author;
   private String subject;
   private String content;
+  private int rating;
 
   @Enumerated(EnumType.STRING)
-  private com.projects.api.core.review.ModerationStatus moderationStatus;
+  private ModerationStatus moderationStatus;
+
+  @Enumerated(EnumType.STRING)
+  private ReviewStatus status;
 
   private Instant createdAt;
   private Instant updatedAt;
@@ -35,14 +41,21 @@ public class ReviewEntity {
   }
 
   public ReviewEntity(int productId, int reviewId, String userId, String author, String subject, String content,
-                      com.projects.api.core.review.ModerationStatus moderationStatus, Instant createdAt, Instant updatedAt) {
+                      ModerationStatus moderationStatus, Instant createdAt, Instant updatedAt) {
+    this(productId, reviewId, userId, author, subject, content, 5, moderationStatus, ReviewStatus.PENDING_MODERATION, createdAt, updatedAt);
+  }
+
+  public ReviewEntity(int productId, int reviewId, String userId, String author, String subject, String content,
+                      int rating, ModerationStatus moderationStatus, ReviewStatus status, Instant createdAt, Instant updatedAt) {
     this.productId = productId;
     this.reviewId = reviewId;
     this.userId = userId;
     this.author = author;
     this.subject = subject;
     this.content = content;
+    this.rating = rating;
     this.moderationStatus = moderationStatus;
+    this.status = status;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -52,9 +65,8 @@ public class ReviewEntity {
     Instant now = Instant.now();
     if (createdAt == null) createdAt = now;
     if (updatedAt == null) updatedAt = now;
-    if (moderationStatus == null) {
-      moderationStatus = com.projects.api.core.review.ModerationStatus.PENDING;
-    }
+    if (moderationStatus == null) moderationStatus = ModerationStatus.PENDING;
+    if (status == null) status = ReviewStatus.PENDING_MODERATION;
   }
 
   @PreUpdate
@@ -83,8 +95,12 @@ public class ReviewEntity {
   public void setSubject(String subject) { this.subject = subject; }
   public String getContent() { return content; }
   public void setContent(String content) { this.content = content; }
-  public com.projects.api.core.review.ModerationStatus getModerationStatus() { return moderationStatus; }
-  public void setModerationStatus(com.projects.api.core.review.ModerationStatus moderationStatus) { this.moderationStatus = moderationStatus; }
+  public int getRating() { return rating; }
+  public void setRating(int rating) { this.rating = rating; }
+  public ModerationStatus getModerationStatus() { return moderationStatus; }
+  public void setModerationStatus(ModerationStatus moderationStatus) { this.moderationStatus = moderationStatus; }
+  public ReviewStatus getStatus() { return status; }
+  public void setStatus(ReviewStatus status) { this.status = status; }
   public Instant getCreatedAt() { return createdAt; }
   public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
   public Instant getUpdatedAt() { return updatedAt; }

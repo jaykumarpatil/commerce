@@ -61,8 +61,8 @@ public class NotificationClientAdapter implements NotificationClientPort {
 
         Notification notification = new Notification();
         notification.setUserId("inventory-service");
-        notification.setType("SYSTEM");
-        notification.setChannel("LOW_STOCK_ALERT");
+        notification.setType(com.projects.api.core.notification.NotificationType.LOW_STOCK_ALERT);
+        notification.setChannel(com.projects.api.core.notification.NotificationChannel.SYSTEM);
         notification.setSubject("Low stock alert: " + request.productId());
         notification.setMessage(context);
         notification.setRecipient(request.recipient());

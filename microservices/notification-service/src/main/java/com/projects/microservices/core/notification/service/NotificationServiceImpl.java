@@ -40,11 +40,14 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Mono<Notification> sendNotification(Notification notification) {
-        if (notification.getType() == null || notification.getType().isEmpty()) {
+        if (notification.getType() == null) {
             return Mono.error(new BadRequestException("Notification type is required"));
         }
         if (notification.getRecipient() == null || notification.getRecipient().isEmpty()) {
             return Mono.error(new BadRequestException("Recipient is required"));
+        }
+        if (notification.getChannel() == null) {
+            return Mono.error(new BadRequestException("Notification channel is required"));
         }
 
         NotificationEntity entity = notificationMapper.apiToEntity(notification);
@@ -52,9 +55,9 @@ public class NotificationServiceImpl implements NotificationService {
         
         return Mono.fromCallable(() -> {
             try {
-                if ("EMAIL".equals(notification.getType())) {
+                if (com.projects.api.core.notification.NotificationChannel.EMAIL.equals(notification.getChannel())) {
                     sendEmailInternal(notification);
-                } else if ("SMS".equals(notification.getType())) {
+                } else if (com.projects.api.core.notification.NotificationChannel.SMS.equals(notification.getChannel())) {
                     sendSMSInternal(notification);
                 }
                 

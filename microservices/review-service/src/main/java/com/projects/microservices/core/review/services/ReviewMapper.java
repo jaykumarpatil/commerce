@@ -2,6 +2,7 @@ package com.projects.microservices.core.review.services;
 
 import com.projects.api.core.review.ModerationStatus;
 import com.projects.api.core.review.Review;
+import com.projects.api.core.review.ReviewStatus;
 import com.projects.microservices.core.review.persistence.ReviewEntity;
 import java.time.Instant;
 import java.util.List;
@@ -21,10 +22,12 @@ public class ReviewMapper {
         entity.getAuthor(),
         entity.getSubject(),
         entity.getContent(),
+        entity.getRating(),
         entity.getModerationStatus(),
         entity.getCreatedAt(),
         entity.getUpdatedAt(),
-        null);
+        null,
+        entity.getStatus());
   }
 
   public ReviewEntity apiToEntity(Review api) {
@@ -33,6 +36,7 @@ public class ReviewMapper {
     }
     Instant now = Instant.now();
     ModerationStatus moderationStatus = api.getModerationStatus() == null ? ModerationStatus.PENDING : api.getModerationStatus();
+    ReviewStatus reviewStatus = api.getStatus() == null ? ReviewStatus.PENDING_MODERATION : api.getStatus();
     return new ReviewEntity(
         api.getProductId(),
         api.getReviewId(),
@@ -40,7 +44,9 @@ public class ReviewMapper {
         api.getAuthor(),
         api.getSubject(),
         api.getContent(),
+        api.getRating(),
         moderationStatus,
+        reviewStatus,
         api.getCreatedAt() == null ? now : api.getCreatedAt(),
         api.getUpdatedAt() == null ? now : api.getUpdatedAt());
   }
