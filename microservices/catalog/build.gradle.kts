@@ -4,10 +4,7 @@ plugins {
 
 dependencies {
   api(project(":shared"))
-  implementation("org.springframework.boot:spring-boot-starter-web")
-  implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  runtimeOnly("org.postgresql:postgresql")
-  implementation("com.vladmihalcea:hibernate-types-52")
+  implementation("org.springframework:spring-context")
 }
 
 java {

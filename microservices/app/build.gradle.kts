@@ -16,13 +16,9 @@ dependencies {
   implementation(project(":payment"))
 
   implementation("org.springframework.boot:spring-boot-starter-web")
-  implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
-  implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("org.flywaydb:flyway-core")
-  implementation("org.springframework.boot:spring-boot-starter-data-redis")
-  runtimeOnly("org.postgresql:postgresql")
-  implementation("com.vladmihalcea:hibernate-types-52") // JSONB support
+
+  testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 java {
