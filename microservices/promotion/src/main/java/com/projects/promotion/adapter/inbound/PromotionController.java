@@ -1,19 +1,17 @@
-package com.project.promotion.adapter.inbound;
+package com.projects.promotion.adapter.inbound;
 
-import com.project.promotion.domain.Coupon;
-import com.project.promotion.domain.DiscountType;
-import com.project.promotion.service.PromotionService;
-import com.project.promotion.api.CouponDTO;
-import com.project.promotion.api.CouponApplyRequest;
-import com.project.promotion.service.PromotionServiceImpl;
+import com.projects.promotion.domain.Coupon;
+import com.projects.promotion.service.PromotionService;
+import com.projects.promotion.api.CouponDTO;
+import com.projects.promotion.api.CouponApplyRequest;
+import com.projects.promotion.service.PromotionServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/com.project/promotion")
+@RequestMapping("/promotion")
 public class PromotionController {
   private final PromotionService promotionService;
 

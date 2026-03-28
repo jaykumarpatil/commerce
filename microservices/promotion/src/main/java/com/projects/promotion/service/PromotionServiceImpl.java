@@ -1,7 +1,7 @@
-package com.project.promotion.service;
+package com.projects.promotion.service;
 
-import com.project.promotion.domain.Coupon;
-import com.project.promotion.domain.DiscountType;
+import com.projects.promotion.domain.Coupon;
+import com.projects.promotion.domain.DiscountType;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.project.promotion.domain;
+package com.projects.promotion.domain;
 
 import java.time.LocalDate;
 
