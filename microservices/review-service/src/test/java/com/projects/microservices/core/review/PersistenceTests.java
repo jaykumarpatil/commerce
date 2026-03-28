@@ -31,7 +31,7 @@ class PersistenceTests extends MySqlTestBase {
   void setupDb() {
     repository.deleteAll();
 
-    ReviewEntity entity = new ReviewEntity(1, 2, "a", "s", "c");
+    ReviewEntity entity = new ReviewEntity(1, 2, "user-a", "a", "s", "c", com.projects.api.core.review.ModerationStatus.PENDING, null, null);
     savedEntity = repository.save(entity);
 
     assertEqualsReview(entity, savedEntity);
@@ -41,7 +41,7 @@ class PersistenceTests extends MySqlTestBase {
   @Test
   void create() {
 
-    ReviewEntity newEntity = new ReviewEntity(1, 3, "a", "s", "c");
+    ReviewEntity newEntity = new ReviewEntity(1, 3, "user-b", "a", "s", "c", com.projects.api.core.review.ModerationStatus.PENDING, null, null);
     repository.save(newEntity);
 
     ReviewEntity foundEntity = repository.findById(newEntity.getId()).get();
@@ -77,7 +77,7 @@ class PersistenceTests extends MySqlTestBase {
   @Test
   void duplicateError() {
     assertThrows(DataIntegrityViolationException.class, () -> {
-      ReviewEntity entity = new ReviewEntity(1, 2, "a", "s", "c");
+      ReviewEntity entity = new ReviewEntity(1, 2, "user-a", "a", "s", "c", com.projects.api.core.review.ModerationStatus.PENDING, null, null);
       repository.save(entity);
     });
 
@@ -112,6 +112,7 @@ class PersistenceTests extends MySqlTestBase {
     assertEquals(expectedEntity.getVersion(),   actualEntity.getVersion());
     assertEquals(expectedEntity.getProductId(), actualEntity.getProductId());
     assertEquals(expectedEntity.getReviewId(),  actualEntity.getReviewId());
+    assertEquals(expectedEntity.getUserId(),    actualEntity.getUserId());
     assertEquals(expectedEntity.getAuthor(),    actualEntity.getAuthor());
     assertEquals(expectedEntity.getSubject(),   actualEntity.getSubject());
     assertEquals(expectedEntity.getContent(),   actualEntity.getContent());

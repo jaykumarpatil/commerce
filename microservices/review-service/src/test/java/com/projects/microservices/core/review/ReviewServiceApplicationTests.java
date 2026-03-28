@@ -102,7 +102,7 @@ class ReviewServiceApplicationTests extends MySqlTestBase {
 
     int productId = 77;
     int reviewId = 77;
-    Review review = new Review(productId, reviewId, "Author", "subject", "content", null);
+    Review review = new Review(productId, reviewId, "user-77", "Author", "subject", "content", com.projects.api.core.review.ModerationStatus.PENDING, null, null, null);
 
     client.post().uri("/review")
       .contentType(APPLICATION_JSON)
@@ -170,7 +170,7 @@ class ReviewServiceApplicationTests extends MySqlTestBase {
   }
 
   private void sendCreateReviewEvent(int productId, int reviewId) {
-    Review review = new Review(productId, reviewId, "Author " + reviewId, "Subject " + reviewId, "Content " + reviewId, "SA");
+    Review review = new Review(productId, reviewId, "user-" + reviewId, "Author " + reviewId, "Subject " + reviewId, "Content " + reviewId, com.projects.api.core.review.ModerationStatus.PENDING, null, null, "SA");
     Event<Integer, Review> event = new Event(CREATE, productId, review);
     messageProcessor.accept(event);
   }

@@ -21,7 +21,7 @@ class MapperTests {
 
     assertNotNull(mapper);
 
-    Review api = new Review(1, 2, "a", "s", "C", "adr");
+    Review api = new Review(1, 2, "user-1", "a", "s", "C", com.projects.api.core.review.ModerationStatus.PENDING, null, null, "adr");
 
     ReviewEntity entity = mapper.apiToEntity(api);
 
@@ -46,7 +46,7 @@ class MapperTests {
 
     assertNotNull(mapper);
 
-    Review api = new Review(1, 2, "a", "s", "C", "adr");
+    Review api = new Review(1, 2, "user-1", "a", "s", "C", com.projects.api.core.review.ModerationStatus.PENDING, null, null, "adr");
     List<Review> apiList = Collections.singletonList(api);
 
     List<ReviewEntity> entityList = mapper.apiListToEntityList(apiList);
