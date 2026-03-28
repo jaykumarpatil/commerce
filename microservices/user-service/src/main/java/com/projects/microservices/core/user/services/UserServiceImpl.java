@@ -307,6 +307,11 @@ public class UserServiceImpl implements UserService {
                 .then();
     }
 
+    @Override
+    public Mono<User> getUser(String userId) {
+        return getUserById(userId).map(mapper::entityToApi);
+    }
+
     public Mono<UserEntity> getUserById(String userId) {
         return repository.findByUserId(userId)
                 .filter(user -> !user.isDeleted())

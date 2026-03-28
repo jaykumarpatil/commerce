@@ -13,9 +13,16 @@ import com.projects.api.core.inventory.StockReservation;
 import com.projects.api.exceptions.BadRequestException;
 import com.projects.api.exceptions.NotFoundException;
 import com.projects.microservices.core.inventory.persistence.*;
+import com.projects.microservices.core.inventory.service.port.outbound.LowStockAlertNotificationRequest;
+import com.projects.microservices.core.inventory.service.port.outbound.NotificationClientPort;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -26,9 +33,17 @@ public class InventoryServiceImpl implements InventoryService {
     private final StockReservationRepository reservationRepository;
     private final InventoryMapper inventoryMapper;
     private final StockReservationMapper reservationMapper;
+    private final NotificationClientPort notificationClientPort;
+    private final Map<String, LowStockAlertState> lowStockAlertStates = new ConcurrentHashMap<>();
 
     @Value("${inventory.low-stock-threshold:10}")
     private int lowStockThreshold;
+
+    @Value("${inventory.low-stock-alert.throttle-minutes:60}")
+    private int lowStockAlertThrottleMinutes;
+
+    @Value("${inventory.low-stock-alert.recipient:inventory-ops}")
+    private String lowStockAlertRecipient;
 
     @Value("${inventory.reservation.timeout-minutes:15}")
     private int reservationTimeoutMinutes;
@@ -36,11 +51,13 @@ public class InventoryServiceImpl implements InventoryService {
     public InventoryServiceImpl(InventoryRepository inventoryRepository,
                                StockReservationRepository reservationRepository,
                                InventoryMapper inventoryMapper,
-                               StockReservationMapper reservationMapper) {
+                               StockReservationMapper reservationMapper,
+                               NotificationClientPort notificationClientPort) {
         this.inventoryRepository = inventoryRepository;
         this.reservationRepository = reservationRepository;
         this.inventoryMapper = inventoryMapper;
         this.reservationMapper = reservationMapper;
+        this.notificationClientPort = notificationClientPort;
     }
 
     @Override
@@ -124,11 +141,58 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Scheduled(fixedRate = 300000)
     public void checkLowStockAlerts() {
+        Instant schedulerRunAt = Instant.now();
         getLowStockItems()
                 .filter(item -> item.getAvailableQuantity() <= lowStockThreshold)
-                .subscribe(item -> LOG.warn("Low stock alert: Product {} has only {} units available", 
-                        item.getProductId(), item.getAvailableQuantity()));
+                .flatMap(item -> sendLowStockAlertIfNeeded(item, schedulerRunAt))
+                .subscribe();
     }
+
+    private Mono<Void> sendLowStockAlertIfNeeded(InventoryItem item, Instant timestamp) {
+        String productId = item.getProductId();
+        Integer availableQuantity = item.getAvailableQuantity();
+
+        LowStockAlertState previousAlertState = lowStockAlertStates.get(productId);
+        boolean quantityChanged = previousAlertState == null
+            || !Objects.equals(previousAlertState.availableQuantity(), availableQuantity);
+        boolean throttleWindowElapsed = previousAlertState == null
+            || Duration.between(previousAlertState.lastSentAt(), timestamp).toMinutes() >= lowStockAlertThrottleMinutes;
+
+        if (!quantityChanged && !throttleWindowElapsed) {
+            return Mono.empty();
+        }
+
+        LowStockAlertNotificationRequest request = new LowStockAlertNotificationRequest(
+            productId,
+            availableQuantity,
+            lowStockThreshold,
+            timestamp,
+            lowStockAlertRecipient
+        );
+
+        return notificationClientPort.sendLowStockAlert(request)
+            .doOnSuccess(ignored -> {
+                lowStockAlertStates.put(productId, new LowStockAlertState(availableQuantity, timestamp));
+                LOG.warn(
+                    "LOW_STOCK_ALERT sent: productId={}, availableQuantity={}, threshold={}, timestamp={}",
+                    productId,
+                    availableQuantity,
+                    lowStockThreshold,
+                    timestamp
+                );
+            })
+            .doOnError(error -> LOG.error(
+                "LOW_STOCK_ALERT failed: productId={}, availableQuantity={}, threshold={}, timestamp={}",
+                productId,
+                availableQuantity,
+                lowStockThreshold,
+                timestamp,
+                error
+            ))
+            .onErrorResume(error -> Mono.empty());
+    }
+
+    private record LowStockAlertState(Integer availableQuantity, Instant lastSentAt) {}
 
     private Mono<StockReservation> reserveFromEntity(InventoryEntity entity, int quantity) {
         if (entity.getAvailableQuantity() < quantity) {

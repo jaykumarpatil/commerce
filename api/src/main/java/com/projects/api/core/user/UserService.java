@@ -1,6 +1,7 @@
 package com.projects.api.core.user;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import reactor.core.publisher.Mono;
 
 public interface UserService {
@@ -31,4 +32,7 @@ public interface UserService {
 
     @PostMapping("/v1/users/{userId}/disable")
     Mono<User> disableUser(String userId);
+
+    @GetMapping("/v1/users/{userId}")
+    Mono<User> getUser(String userId);
 }

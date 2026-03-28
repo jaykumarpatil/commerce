@@ -68,4 +68,9 @@ public class CartController implements CartService {
     public Mono<Cart> calculateTotals(String cartId) {
         return cartService.calculateTotals(cartId);
     }
+
+    @Override
+    public Mono<CartValidationResult> validateCart(String cartId) {
+        return cartService.validateCart(cartId);
+    }
 }

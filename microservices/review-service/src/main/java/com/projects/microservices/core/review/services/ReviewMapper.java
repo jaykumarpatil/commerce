@@ -1,7 +1,9 @@
 package com.projects.microservices.core.review.services;
 
+import com.projects.api.core.review.ModerationStatus;
 import com.projects.api.core.review.Review;
 import com.projects.microservices.core.review.persistence.ReviewEntity;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -15,9 +17,13 @@ public class ReviewMapper {
     return new Review(
         entity.getProductId(),
         entity.getReviewId(),
+        entity.getUserId(),
         entity.getAuthor(),
         entity.getSubject(),
         entity.getContent(),
+        entity.getModerationStatus(),
+        entity.getCreatedAt(),
+        entity.getUpdatedAt(),
         null);
   }
 
@@ -25,12 +31,18 @@ public class ReviewMapper {
     if (api == null) {
       return null;
     }
+    Instant now = Instant.now();
+    ModerationStatus moderationStatus = api.getModerationStatus() == null ? ModerationStatus.PENDING : api.getModerationStatus();
     return new ReviewEntity(
         api.getProductId(),
         api.getReviewId(),
+        api.getUserId(),
         api.getAuthor(),
         api.getSubject(),
-        api.getContent());
+        api.getContent(),
+        moderationStatus,
+        api.getCreatedAt() == null ? now : api.getCreatedAt(),
+        api.getUpdatedAt() == null ? now : api.getUpdatedAt());
   }
 
   public List<Review> entityListToApiList(List<ReviewEntity> entityList) {

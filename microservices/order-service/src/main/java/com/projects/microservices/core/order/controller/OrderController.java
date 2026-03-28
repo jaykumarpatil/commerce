@@ -55,6 +55,11 @@ public class OrderController implements OrderService {
     }
 
     @Override
+    public Flux<OrderEvent> getOrderEvents(String orderId) {
+        return orderService.getOrderEvents(orderId);
+    }
+
+    @Override
     public Mono<Order> updateShippingInfo(String orderId, String trackingNumber, String carrier) {
         return orderService.updateShippingInfo(orderId, trackingNumber, carrier);
     }
