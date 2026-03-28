@@ -2,34 +2,69 @@
 
 A Spring-based e-commerce microservices repository with both classic and hexagonal domain implementations, Spring Cloud edge/security services, and local infrastructure orchestration for Kafka/RabbitMQ-backed event flows.
 
-## What this repository contains
+## Service Map (Grouped by Domain Area)
 
-### Core shared modules
-- `:api` — shared API contracts, DTOs, and exception types used across services.
-- `:util` — shared utility classes for HTTP/error handling and common helpers.
+### Shared libraries
+- `:api` — defines shared API contracts, DTO transfer objects, and common exception types so all services speak the same contract language.
+- `:util` — hosts shared utility classes (HTTP helpers, error handling scaffolding, logging/formatting, retry/backoff helpers) to avoid cross-service duplication.
 
-### Core microservices
-- Product, Review, Recommendation, Product Composite
-- User, Product Catalog, Shopping Cart, Order, Inventory
-- Payment, Shipping, Notification
-- Admin, Analytics
+### Core microservices (OLTP / business)
 
-### Hexagonal domain variants (pilot/migration modules)
-- Cart domain (`:microservices:cart-domain:shopping-cart-service`)
-- Order domain (`:microservices:order-domain:order-service`)
-- Auth domain (`:microservices:auth-domain:user-service`)
-- Payment domain (`:microservices:payment-domain:payment-service`)
-- Catalog domain (`:microservices:catalog-domain:product-catalog-service`)
-- Inventory domain (`:microservices:inventory-domain:inventory-service`)
-- Notification domain (`:microservices:notification-domain:notification-service`)
-- Review domain (`:microservices:review-domain:review-service`)
-- Recommendation domain (`:microservices:recommendation-domain:recommendation-service`)
-- Analytics domain (`:microservices:analytics-domain:analytics-service`, `:microservices:analytics-domain:admin-service`)
-- Composite domain (`:microservices:composite-domain:product-composite-service`)
+#### Catalog & product experience
+- `:microservices:product-service` — product master data, pricing, variants, and product metadata used by catalog/cart/checkout.
+- `:microservices:review-service` — product reviews, ratings, and moderation workflows.
+- `:microservices:recommendation-service` — recommendation APIs such as similar items and frequently-bought-together.
+- `:microservices:product-composite-service` — facade that aggregates product, review, recommendation, and related catalog-facing data.
+- `:microservices:product-catalog-service` — shopper-facing product listings, category navigation, and discovery/search-facing views.
 
-### Spring Cloud services
-- `:spring-cloud:gateway` — edge gateway and TLS entrypoint.
-- `:spring-cloud:authorization-server` — OAuth2 authorization server.
+#### Shopping, checkout & fulfillment
+- `:microservices:shopping-cart-service` — user cart state, quantity management, and checkout-readiness.
+- `:microservices:order-service` — order lifecycle, status transitions, cancellations, and refund orchestration.
+- `:microservices:inventory-service` — stock levels, reservations, and allocations to prevent overselling.
+- `:microservices:payment-service` — payment authorization/capture/reconciliation with external providers.
+- `:microservices:shipping-service` — shipment creation, carrier coordination, and tracking lifecycle.
+
+#### Identity, engagement & operations
+- `:microservices:user-service` — user identities, profiles, and account metadata (business-facing user context).
+- `:microservices:notification-service` — event-driven outbound notifications (email/SMS/push).
+- `:microservices:admin-service` — internal administration and operational support APIs.
+- `:microservices:analytics-service` — behavior and operational aggregation for dashboards/reports.
+
+### Hexagonal domain variants (pilot / migration)
+
+#### Shopping domain
+- `:microservices:cart-domain:shopping-cart-service` — cart bounded context with explicit ports/adapters.
+- `:microservices:order-domain:order-service` — order bounded context and lifecycle/state machine ownership.
+
+#### Identity domain
+- `:microservices:auth-domain:user-service` — auth/identity concerns (auth, roles, sessions), separated from business profile concerns.
+
+#### Catalog domain
+- `:microservices:catalog-domain:product-catalog-service` — product discoverability/search/category logic as a bounded context.
+
+#### Inventory domain
+- `:microservices:inventory-domain:inventory-service` — inventory reservations, allocations, and replenishment event logic.
+
+#### Payments domain
+- `:microservices:payment-domain:payment-service` — isolated payment domain integrations and secret-bearing flows.
+
+#### Notification domain
+- `:microservices:notification-domain:notification-service` — reusable channel/template/delivery domain.
+
+#### Reviews & recommendations
+- `:microservices:review-domain:review-service` — review moderation/rating/spam-defense rules.
+- `:microservices:recommendation-domain:recommendation-service` — recommendation model and tuning lifecycle.
+
+#### Analytics & admin
+- `:microservices:analytics-domain:analytics-service` — domain event aggregation into analytics-ready datasets.
+- `:microservices:analytics-domain:admin-service` — admin APIs for operations/configuration built from analytics + core data.
+
+#### Composite domain
+- `:microservices:composite-domain:product-composite-service` — domain facade coordinating product/review/recommendation/catalog dependencies.
+
+### Spring Cloud infrastructure
+- `:spring-cloud:gateway` — edge gateway and TLS entrypoint; routing, auth passthrough, and cross-cutting policies.
+- `:spring-cloud:authorization-server` — OAuth2/OIDC authorization server for token issuance and client/consent flows.
 
 ## Message brokers and data stores
 

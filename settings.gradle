@@ -1,53 +1,59 @@
+// Shared libraries
 include ':api'
 include ':util'
+
+// Core microservices (OLTP / business)
+// Catalog & product experience
 include ':microservices:product-service'
 include ':microservices:review-service'
 include ':microservices:recommendation-service'
 include ':microservices:product-composite-service'
-include ':microservices:user-service'
 include ':microservices:product-catalog-service'
+
+// Shopping, checkout & fulfillment
 include ':microservices:shopping-cart-service'
 include ':microservices:order-service'
 include ':microservices:inventory-service'
 include ':microservices:payment-service'
 include ':microservices:shipping-service'
+
+// Identity, engagement & operations
+include ':microservices:user-service'
 include ':microservices:notification-service'
 include ':microservices:admin-service'
 include ':microservices:analytics-service'
 
-// Hexagonal Architecture - Cart Domain
+// Hexagonal domain variants (pilot / migration)
+// Shopping domain
 include ':microservices:cart-domain:shopping-cart-service'
-
-// Hexagonal Architecture - Order Domain
 include ':microservices:order-domain:order-service'
 
-// Hexagonal Architecture - Auth Domain
+// Identity / security domain
 include ':microservices:auth-domain:user-service'
 
-// Hexagonal Architecture - Payment Domain
+// Payments domain
 include ':microservices:payment-domain:payment-service'
 
-// Hexagonal Architecture - Catalog Domain
+// Catalog domain
 include ':microservices:catalog-domain:product-catalog-service'
 
-// Hexagonal Architecture - Inventory Domain
+// Inventory domain
 include ':microservices:inventory-domain:inventory-service'
 
-// Hexagonal Architecture - Notification Domain
+// Notification domain
 include ':microservices:notification-domain:notification-service'
 
-// Hexagonal Architecture - Review Domain
+// Reviews & recommendations
 include ':microservices:review-domain:review-service'
-
-// Hexagonal Architecture - Recommendation Domain
 include ':microservices:recommendation-domain:recommendation-service'
 
-// Hexagonal Architecture - Analytics Domain
+// Analytics & admin
 include ':microservices:analytics-domain:analytics-service'
 include ':microservices:analytics-domain:admin-service'
 
-// Hexagonal Architecture - Composite Domain
+// Composite domain
 include ':microservices:composite-domain:product-composite-service'
 
+// Spring Cloud infrastructure services
 include ':spring-cloud:gateway'
 include ':spring-cloud:authorization-server'
