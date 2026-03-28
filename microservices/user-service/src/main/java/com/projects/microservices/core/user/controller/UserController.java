@@ -68,4 +68,9 @@ public class UserController implements UserService {
     public Mono<User> disableUser(String userId) {
         return userService.disableUser(userId);
     }
+
+    @Override
+    public Mono<User> getUser(String userId) {
+        return userService.getUser(userId);
+    }
 }

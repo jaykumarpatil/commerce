@@ -41,3 +41,10 @@ logging:
     root: INFO
     com.projects: DEBUG
     reactor: DEBUG
+
+cart:
+  item:
+    max-quantity: ${CART_ITEM_MAX_QUANTITY:20}
+  expiration:
+    days: ${CART_EXPIRATION_DAYS:30}
+    cleanup-cron: ${CART_EXPIRATION_CLEANUP_CRON:0 0 2 * * *}
