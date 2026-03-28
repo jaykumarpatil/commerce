@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: catalog-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/catalog
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus

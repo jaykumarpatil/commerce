@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: order-service
+  config:
+    import: optional:file:./config-repo/order-service.yml
+
+  r2dbc:
+    url: r2dbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/orders
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    pool:
+      initial-size: 5
+      max-size: 20
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    se.magnus.microservices.order: DEBUG
+    org.springframework.data.r2dbc: INFO

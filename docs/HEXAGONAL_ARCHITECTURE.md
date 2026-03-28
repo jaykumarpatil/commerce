@@ -2,7 +2,23 @@
 
 ## Overview
 
-This document describes the proposed hexagonal (ports and adapters) architecture for the e-commerce microservices platform. This is a **future-state architecture** to be implemented incrementally.
+This document describes the hexagonal (ports and adapters) architecture for the e-commerce microservices platform. The cart-domain has been **successfully migrated** as a pilot, and other domains can be migrated following the same pattern.
+
+## Migration Status
+
+| Domain | Status | Notes |
+|--------|--------|-------|
+| **cart-domain** | ✅ **COMPLETED** | Shopping cart with Redis caching |
+| **order-domain** | ✅ **COMPLETED** | Order management with status transitions |
+| **auth-domain** | ✅ **COMPLETED** | User authentication with JWT tokens |
+| catalog-domain | ⏳ Pending | CATALOG-001, SEARCH-001 |
+| payment-domain | ⏳ Pending | CHECKOUT-001 |
+| inventory-domain | ⏳ Pending | ORDER-001 |
+| notification-domain | ⏳ Pending | NOTIFICATION-001 |
+| review-domain | ⏳ Pending | REVIEW-001 |
+| recommendation-domain | ⏳ Pending | RECOMMENDATION-001 |
+| analytics-domain | ⏳ Pending | ANALYTICS-001, ADMIN-001 |
+| composite-domain | ⏳ Pending | API-001 |
 
 ## Domain Structure
 
@@ -139,3 +155,53 @@ microservices/
 2. **Ports over Frameworks**: Define interfaces independent of implementation
 3. **Single Responsibility**: Each adapter has one job
 4. **Testability**: Core business logic testable without infrastructure
+
+## Cart-Domain Implementation (Pilot)
+
+The cart-domain has been successfully migrated with the following structure:
+
+```
+microservices/cart-domain/shopping-cart-service/
+├── build.gradle
+├── src/main/java/se/magnus/microservices/cart/
+│   ├── CartServiceApplication.java           # Main application
+│   ├── config/JacksonConfig.java            # Configuration
+│   ├── domain/
+│   │   ├── model/
+│   │   │   ├── CartEntity.java             # Cart aggregate root
+│   │   │   ├── CartItemEntity.java         # Cart item entity
+│   │   │   └── CartItemOptionEntity.java  # Item options
+│   │   ├── service/
+│   │   │   └── CartDomainService.java     # Domain logic (totals calculation)
+│   │   └── event/
+│   │       └── CartEvent.java              # Sealed class for domain events
+│   ├── application/
+│   │   ├── port/
+│   │   │   ├── inbound/
+│   │   │   │   ├── CartCommandPort.java   # Command interface
+│   │   │   │   └── CartQueryPort.java     # Query interface
+│   │   │   └── outbound/
+│   │   │       ├── CartRepositoryPort.java # Repository interface
+│   │   │       ├── CartCachePort.java     # Cache interface
+│   │   │       └── CartEventPublisherPort.java # Event interface
+│   │   └── usecase/
+│   │       ├── CartCommandUseCase.java    # Command implementation
+│   │       └── CartQueryUseCase.java      # Query implementation
+│   └── adapter/
+│       ├── inbound/rest/
+│       │   └── CartController.java        # REST adapter
+│       └── outbound/
+│           ├── persistence/
+│           │   ├── CartMongoRepository.java    # MongoDB repository
+│           │   └── CartRepositoryAdapter.java  # Persistence adapter
+│           └── redis/
+│               └── CartRedisCacheAdapter.java  # Redis cache adapter
+```
+
+### Key Patterns Used
+
+1. **Sealed Interfaces for Events**: `CartEvent` uses sealed classes for type-safe domain events
+2. **Port Interfaces**: All external dependencies are abstracted behind interfaces
+3. **Use Case Classes**: Business logic is encapsulated in use case implementations
+4. **Entity Methods**: Domain logic like `addItem()`, `removeItem()` lives in entities
+5. **Cache-Aside Pattern**: Repository queries check cache first

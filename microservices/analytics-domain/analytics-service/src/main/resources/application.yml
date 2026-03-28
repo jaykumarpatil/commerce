@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: analytics-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/analytics
+server:
+  port: 8080

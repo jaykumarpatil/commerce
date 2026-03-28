@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: review-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/reviews
+server:
+  port: 8080

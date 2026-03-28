@@ -14,5 +14,40 @@ include ':microservices:shipping-service'
 include ':microservices:notification-service'
 include ':microservices:admin-service'
 include ':microservices:analytics-service'
+
+// Hexagonal Architecture - Cart Domain
+include ':microservices:cart-domain:shopping-cart-service'
+
+// Hexagonal Architecture - Order Domain
+include ':microservices:order-domain:order-service'
+
+// Hexagonal Architecture - Auth Domain
+include ':microservices:auth-domain:user-service'
+
+// Hexagonal Architecture - Payment Domain
+include ':microservices:payment-domain:payment-service'
+
+// Hexagonal Architecture - Catalog Domain
+include ':microservices:catalog-domain:product-catalog-service'
+
+// Hexagonal Architecture - Inventory Domain
+include ':microservices:inventory-domain:inventory-service'
+
+// Hexagonal Architecture - Notification Domain
+include ':microservices:notification-domain:notification-service'
+
+// Hexagonal Architecture - Review Domain
+include ':microservices:review-domain:review-service'
+
+// Hexagonal Architecture - Recommendation Domain
+include ':microservices:recommendation-domain:recommendation-service'
+
+// Hexagonal Architecture - Analytics Domain
+include ':microservices:analytics-domain:analytics-service'
+include ':microservices:analytics-domain:admin-service'
+
+// Hexagonal Architecture - Composite Domain
+include ':microservices:composite-domain:product-composite-service'
+
 include ':spring-cloud:gateway'
 include ':spring-cloud:authorization-server'
