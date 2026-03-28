@@ -1,0 +1,111 @@
+version: '3.9'
+services:
+  elasticsearch1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.3
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-dc
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - ES_JAVA_OPTS=-Xms512m -Xmx1g
+      - discovery.type=single-node=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 2g
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - infra-net
+
+  elasticsearch2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.3
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=es-dc
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - ES_JAVA_OPTS=-Xms512m -Xmx1g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 2g
+    volumes:
+      - esdata02:/usr/share/elasticsearch/data
+    ports:
+      - "9201:9200"
+    networks:
+      - infra-net
+
+  elasticsearch3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.3
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=es-dc
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - ES_JAVA_OPTS=-Xms512m -Xmx1g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 2g
+    volumes:
+      - esdata03:/usr/share/elasticsearch/data
+    ports:
+      - "9202:9200"
+    networks:
+      - infra-net
+
+  redis-node-1:
+    image: redis:7
+    container_name: redis-node-1
+    command: ["redis-server", "--port", "6379", "--cluster-enabled", "yes", "--cluster-config-file", "nodes.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-node-1-data:/data
+    networks:
+      - infra-net
+
+  redis-node-2:
+    image: redis:7
+    container_name: redis-node-2
+    command: ["redis-server", "--port", "6379", "--cluster-enabled", "yes", "--cluster-config-file", "nodes.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes"]
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-node-2-data:/data
+    networks:
+      - infra-net
+
+  redis-node-3:
+    image: redis:7
+    container_name: redis-node-3
+    command: ["redis-server", "--port", "6379", "--cluster-enabled", "yes", "--cluster-config-file", "nodes.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes"]
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis-node-3-data:/data
+    networks:
+      - infra-net
+
+volumes:
+  esdata01: {}
+  esdata02: {}
+  esdata03: {}
+  redis-node-1-data: {}
+  redis-node-2-data: {}
+  redis-node-3-data: {}
+
+networks:
+  infra-net:
+    driver: bridge
