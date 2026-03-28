@@ -50,7 +50,7 @@ public class OrderController implements OrderService {
     }
 
     @Override
-    public Mono<Order> updatePaymentStatus(String orderId, String paymentStatus) {
+    public Mono<Order> updatePaymentStatus(String orderId, com.projects.api.core.payment.PaymentStatus paymentStatus) {
         return orderService.updatePaymentStatus(orderId, paymentStatus);
     }
 

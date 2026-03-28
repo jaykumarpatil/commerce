@@ -23,6 +23,7 @@ import com.projects.api.core.review.ModerationStatus;
 import com.projects.api.core.review.Review;
 import com.projects.api.core.review.ReviewRatingSummary;
 import com.projects.api.core.review.ReviewService;
+import com.projects.api.core.review.ReviewStatus;
 import com.projects.api.exceptions.InvalidInputException;
 import com.projects.api.exceptions.NotFoundException;
 import com.projects.microservices.core.review.persistence.ReviewEntity;
@@ -177,6 +178,12 @@ public class ReviewServiceImpl implements ReviewService {
     list.forEach(e -> e.setServiceAddress(serviceUtil.getServiceAddress()));
     LOG.debug("Response size: {}", list.size());
     return list;
+  }
+
+
+  @Override
+  public Mono<Review> updateReviewStatus(int productId, int reviewId, ReviewStatus status) {
+    return Mono.error(new InvalidInputException("Review status updates are not persisted yet. Requested status: " + status));
   }
 
   @Override

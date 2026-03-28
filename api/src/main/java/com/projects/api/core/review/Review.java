@@ -13,6 +13,7 @@ public class Review {
   private Instant createdAt;
   private Instant updatedAt;
   private String serviceAddress;
+  private ReviewStatus status;
 
   public Review() {
     productId = 0;
@@ -25,6 +26,7 @@ public class Review {
     createdAt = null;
     updatedAt = null;
     serviceAddress = null;
+    status = ReviewStatus.PENDING_MODERATION;
   }
 
   public Review(
@@ -59,6 +61,18 @@ public class Review {
       Instant updatedAt,
       String serviceAddress) {
 
+    this(productId, reviewId, author, subject, content, serviceAddress, ReviewStatus.PENDING_MODERATION);
+  }
+
+  public Review(
+    int productId,
+    int reviewId,
+    String author,
+    String subject,
+    String content,
+    String serviceAddress,
+    ReviewStatus status) {
+
     this.productId = productId;
     this.reviewId = reviewId;
     this.userId = userId;
@@ -69,6 +83,7 @@ public class Review {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.serviceAddress = serviceAddress;
+    this.status = status == null ? ReviewStatus.PENDING_MODERATION : status;
   }
 
   public int getProductId() {
@@ -111,6 +126,10 @@ public class Review {
     return serviceAddress;
   }
 
+  public ReviewStatus getStatus() {
+    return status;
+  }
+
   public void setProductId(int productId) {
     this.productId = productId;
   }
@@ -149,5 +168,9 @@ public class Review {
 
   public void setServiceAddress(String serviceAddress) {
     this.serviceAddress = serviceAddress;
+  }
+
+  public void setStatus(ReviewStatus status) {
+    this.status = status;
   }
 }

@@ -1,5 +1,7 @@
 package com.projects.api.core.shipping;
 
+import com.projects.api.core.common.PaginationRequest;
+import com.projects.api.core.common.PaginationResponse;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -11,6 +13,15 @@ public interface ShippingService {
 
     @GetMapping("/v1/shipping/addresses/user/{userId}")
     Flux<ShippingAddress> getAddressesByUserId(String userId);
+
+    default Mono<PaginationResponse<ShippingAddress>> getAddressesByUserId(String userId, PaginationRequest paginationRequest) {
+        final PaginationRequest request = paginationRequest == null ? new PaginationRequest() : paginationRequest;
+        return getAddressesByUserId(userId)
+            .skip((long) request.getPage() * request.getSize())
+            .take(request.getSize())
+            .collectList()
+            .map(items -> PaginationResponse.of(items, request.getPage(), request.getSize()));
+    }
 
     @GetMapping("/v1/shipping/rates")
     Mono<ShippingRate> calculateShippingRate(ShippingRate rate);
@@ -24,8 +35,13 @@ public interface ShippingService {
     @GetMapping("/v1/shipping/shipments/order/{orderId}")
     Mono<Shipment> getShipmentByOrderId(String orderId);
 
+    Mono<Shipment> updateShipmentStatus(String shipmentId, ShipmentStatus status);
+
+    @Deprecated
     @PatchMapping("/v1/shipping/shipments/{shipmentId}/status")
-    Mono<Shipment> updateShipmentStatus(String shipmentId, String status);
+    default Mono<Shipment> updateShipmentStatus(String shipmentId, String status) {
+        return updateShipmentStatus(shipmentId, ShipmentStatus.from(status));
+    }
 
     @PatchMapping("/v1/shipping/shipments/{shipmentId}/tracking")
     Mono<Shipment> updateTrackingNumber(String shipmentId, String trackingNumber);

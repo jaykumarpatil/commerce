@@ -1,5 +1,7 @@
 package com.projects.api.core.review;
 
+import com.projects.api.core.common.PaginationRequest;
+import com.projects.api.core.common.PaginationResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
