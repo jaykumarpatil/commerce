@@ -128,7 +128,7 @@ main() {
   section "2) COMPILE/BUILD: compile source and resolve dependencies"
   run_cmd ./gradlew assemble --no-daemon
   pushd "$FRONTEND_DIR" >/dev/null
-  run_cmd npm ci --prefer-offline
+  run_cmd npm install --prefer-offline
   run_cmd npm run build -- --configuration production
   popd >/dev/null
 
