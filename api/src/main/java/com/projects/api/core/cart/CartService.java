@@ -1,7 +1,6 @@
 package com.projects.api.core.cart;
 
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface CartService {
@@ -35,4 +34,7 @@ public interface CartService {
 
     @PostMapping("/v1/carts/{cartId}/calculate")
     Mono<Cart> calculateTotals(String cartId);
+
+    @GetMapping("/v1/carts/{cartId}/validate")
+    Mono<CartValidationResult> validateCart(String cartId);
 }
