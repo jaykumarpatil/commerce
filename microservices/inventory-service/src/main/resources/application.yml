@@ -47,3 +47,30 @@ logging:
     root: INFO
     com.projects: DEBUG
     org.hibernate.SQL: DEBUG
+
+app:
+  notification-service:
+    url: ${NOTIFICATION_SERVICE_URL:http://notification-service}
+
+inventory:
+  low-stock-alert:
+    recipient: ${LOW_STOCK_ALERT_RECIPIENT:inventory-ops}
+    throttle-minutes: ${LOW_STOCK_ALERT_THROTTLE_MINUTES:60}
+
+resilience4j:
+  retry:
+    instances:
+      notificationClient:
+        max-attempts: ${NOTIFICATION_RETRY_MAX_ATTEMPTS:3}
+        wait-duration: ${NOTIFICATION_RETRY_WAIT:2s}
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2.0
+  circuitbreaker:
+    instances:
+      notificationClient:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
