@@ -11,7 +11,7 @@ subprojects {
   // Use Java toolchains to enforce Java 26 across modules
   java {
     toolchain {
-      languageVersion.set(org.gradle.jvm.toolchains.JavaLanguageVersion.of(26))
+      languageVersion.set(org.gradle.jvm.toolchains.JavaLanguageVersion.of(25))
     }
   }
 }

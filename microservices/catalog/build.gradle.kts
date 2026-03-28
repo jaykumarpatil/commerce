@@ -9,6 +9,6 @@ dependencies {
 
 java {
   toolchain {
-    languageVersion.set(org.gradle.jvm.toolchains.JavaLanguageVersion.of(26))
+    languageVersion.set(org.gradle.jvm.toolchains.JavaLanguageVersion.of(25))
   }
 }

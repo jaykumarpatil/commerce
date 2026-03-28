@@ -1,4 +1,4 @@
-FROM fluent/fluentd-kubernetes-daemonset:v1.4.2-debian-elasticsearch-1.1
+FROM eclipse-temurin:25-jre
 
 RUN gem install fluent-plugin-detect-exceptions -v 0.0.12 \
  && gem sources --clear-all \

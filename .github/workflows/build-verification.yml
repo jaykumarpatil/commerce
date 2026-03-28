@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  JAVA_VERSION: '26'
-  NODE_VERSION: '22'
+  JAVA_VERSION: '25'
+  NODE_VERSION: '21'
   COVERAGE_THRESHOLD: '80'
 
 jobs:
