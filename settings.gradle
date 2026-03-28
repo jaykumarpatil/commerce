@@ -1,58 +1,25 @@
+rootProject.name = 'ecom-modular-monolith'
+
 // Shared libraries
+include ':shared'
 include ':api'
 include ':util'
 
-// Core microservices (OLTP / business)
-// Catalog & product experience
+// Core microservices (deduplicated: keep one folder per service)
 include ':microservices:product-service'
 include ':microservices:review-service'
 include ':microservices:recommendation-service'
 include ':microservices:product-composite-service'
 include ':microservices:product-catalog-service'
-
-// Shopping, checkout & fulfillment
 include ':microservices:shopping-cart-service'
 include ':microservices:order-service'
 include ':microservices:inventory-service'
 include ':microservices:payment-service'
 include ':microservices:shipping-service'
-
-// Identity, engagement & operations
 include ':microservices:user-service'
 include ':microservices:notification-service'
 include ':microservices:admin-service'
 include ':microservices:analytics-service'
-
-// Hexagonal domain variants (pilot / migration)
-// Shopping domain
-include ':microservices:cart-domain:shopping-cart-service'
-include ':microservices:order-domain:order-service'
-
-// Identity / security domain
-include ':microservices:auth-domain:user-service'
-
-// Payments domain
-include ':microservices:payment-domain:payment-service'
-
-// Catalog domain
-include ':microservices:catalog-domain:product-catalog-service'
-
-// Inventory domain
-include ':microservices:inventory-domain:inventory-service'
-
-// Notification domain
-include ':microservices:notification-domain:notification-service'
-
-// Reviews & recommendations
-include ':microservices:review-domain:review-service'
-include ':microservices:recommendation-domain:recommendation-service'
-
-// Analytics & admin
-include ':microservices:analytics-domain:analytics-service'
-include ':microservices:analytics-domain:admin-service'
-
-// Composite domain
-include ':microservices:composite-domain:product-composite-service'
 
 // Spring Cloud infrastructure services
 include ':spring-cloud:gateway'
