@@ -45,13 +45,18 @@ public class OrderController implements OrderService {
     }
 
     @Override
-    public Mono<Order> updateOrderStatus(String orderId, String status) {
+    public Mono<Order> updateOrderStatus(String orderId, OrderStatus status) {
         return orderService.updateOrderStatus(orderId, status);
     }
 
     @Override
     public Mono<Order> updatePaymentStatus(String orderId, String paymentStatus) {
         return orderService.updatePaymentStatus(orderId, paymentStatus);
+    }
+
+    @Override
+    public Flux<OrderEvent> getOrderEvents(String orderId) {
+        return orderService.getOrderEvents(orderId);
     }
 
     @Override

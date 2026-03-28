@@ -47,3 +47,18 @@ logging:
     root: INFO
     com.projects: DEBUG
     org.hibernate.SQL: DEBUG
+
+app:
+  services:
+    shopping-cart:
+      base-url: ${SHOPPING_CART_SERVICE_URL:http://shopping-cart-service}
+    inventory:
+      base-url: ${INVENTORY_SERVICE_URL:http://inventory-service}
+    payment:
+      base-url: ${PAYMENT_SERVICE_URL:http://payment-service}
+    shipping:
+      base-url: ${SHIPPING_SERVICE_URL:http://shipping-service}
+    notification:
+      base-url: ${NOTIFICATION_SERVICE_URL:http://notification-service}
+    user:
+      base-url: ${USER_SERVICE_URL:http://user-service}
