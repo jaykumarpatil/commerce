@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 public class Notification {
     private String notificationId;
     private String userId;
-    private String type; // EMAIL, SMS, PUSH
-    private String channel; // ORDER_CONFIRMATION, PAYMENT_SUCCESS, SHIPPING_UPDATE
+    private NotificationType type;
+    private NotificationChannel channel;
     private String subject;
     private String message;
     private String recipient;

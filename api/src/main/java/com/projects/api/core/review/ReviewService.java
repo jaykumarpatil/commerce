@@ -40,6 +40,15 @@ public interface ReviewService {
     produces = "application/json")
   Mono<ReviewRatingSummary> getReviewSummary(@RequestParam(value = "productId", required = true) int productId);
 
+
+  @PatchMapping(
+    value = "/review/{reviewId}/status",
+    produces = "application/json")
+  Mono<Review> updateReviewStatus(
+    @RequestParam(value = "productId", required = true) int productId,
+    @PathVariable int reviewId,
+    @RequestParam(value = "status", required = true) ReviewStatus status);
+
   @DeleteMapping(value = "/review")
   Mono<Void> deleteReviews(@RequestParam(value = "productId", required = true) int productId);
 }

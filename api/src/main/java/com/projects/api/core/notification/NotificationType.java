@@ -1,0 +1,16 @@
+package com.projects.api.core.notification;
+
+public enum NotificationType {
+    ORDER_CONFIRMED,
+    ORDER_CANCELLED,
+    PAYMENT_SUCCESS,
+    PAYMENT_FAILED,
+    SHIPMENT_CREATED,
+    SHIPMENT_IN_TRANSIT,
+    SHIPMENT_DELIVERED,
+    REFUND_ISSUED,
+    PASSWORD_RESET,
+    WELCOME,
+    LOW_STOCK_ALERT,
+    SYSTEM_EVENT
+}
