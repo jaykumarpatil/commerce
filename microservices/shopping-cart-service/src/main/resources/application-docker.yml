@@ -39,5 +39,5 @@ management:
 logging:
   level:
     root: INFO
-    se.magnus: DEBUG
+    com.projects: DEBUG
     reactor: DEBUG

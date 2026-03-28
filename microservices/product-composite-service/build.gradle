@@ -10,7 +10,7 @@ java {
     }
 }
 
-group = 'se.magnus.microservices.composite.product'
+group = 'com.projects.microservices.composite.product'
 version = '1.0.0-SNAPSHOT'
 
 

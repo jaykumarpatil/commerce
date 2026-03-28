@@ -10,7 +10,7 @@ java {
     }
 }
 
-group = 'se.magnus.microservices.core.recommendation'
+group = 'com.projects.microservices.core.recommendation'
 version = '1.0.0-SNAPSHOT'
 
 

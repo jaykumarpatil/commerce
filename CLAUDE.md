@@ -54,9 +54,9 @@ Root Project
 
 | Module | Base Package |
 |--------|--------------|
-| API library | `se.magnus.api` |
-| Core microservices | `se.magnus.microservices.core.<service>` |
-| Composite services | `se.magnus.microservices.composite.<domain>` |
+| API library | `com.projects.api` |
+| Core microservices | `com.projects.microservices.core.<service>` |
+| Composite services | `com.projects.microservices.composite.<domain>` |
 
 ### Core Patterns
 

@@ -10,7 +10,7 @@ java {
     }
 }
 
-group = 'se.magnus.springcloud'
+group = 'com.projects.springcloud'
 version = '1.0.0-SNAPSHOT'
 
 

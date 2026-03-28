@@ -1,4 +1,4 @@
-package com.example.ecom.shared.api;
+package com.projects.ecom.shared.api;
 
 import java.util.List;
 

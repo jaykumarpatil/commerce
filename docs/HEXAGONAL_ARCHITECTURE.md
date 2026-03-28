@@ -141,8 +141,8 @@ microservices/
 ## Shared Libraries
 
 ### Current (via api module)
-- `se.magnus.api.core.*` - DTOs and API interfaces
-- `se.magnus.api.exceptions` - Common exceptions
+- `com.projects.api.core.*` - DTOs and API interfaces
+- `com.projects.api.exceptions` - Common exceptions
 
 ### Future (Domain-specific)
 - `auth-domain-model` - Auth domain types

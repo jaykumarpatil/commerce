@@ -29,5 +29,5 @@ management:
 
 logging:
   level:
-    se.magnus.microservices.payment: DEBUG
+    com.projects.microservices.payment: DEBUG
     org.springframework.data.r2dbc: INFO

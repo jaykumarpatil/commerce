@@ -1,7 +1,7 @@
 springdoc:
   swagger-ui.path: /openapi/swagger-ui.html
   api-docs.path: /openapi/v3/api-docs
-  packagesToScan: se.magnus.microservices.composite.product
+  packagesToScan: com.projects.microservices.composite.product
   pathsToMatch: /**
   cache.disabled: true
 
@@ -126,13 +126,13 @@ resilience4j.circuitbreaker:
       permittedNumberOfCallsInHalfOpenState: 3
       automaticTransitionFromOpenToHalfOpenEnabled: true
       ignoreExceptions:
-        - se.magnus.api.exceptions.InvalidInputException
-        - se.magnus.api.exceptions.NotFoundException
+        - com.projects.api.exceptions.InvalidInputException
+        - com.projects.api.exceptions.NotFoundException
 
 logging:
   level:
     root: INFO
-    se.magnus: INFO
+    com.projects: INFO
     org.springframework.web.server.adapter.HttpWebHandlerAdapter: INFO
 
 # To see tracing headers, uncomment the following two lines and restart the product-composite service
@@ -165,5 +165,5 @@ spring.config.activate.on-profile: prod
 logging:
   level:
     root: WARN
-    se.magnus: WARN
+    com.projects: WARN
     org.springframework.web.server.adapter.HttpWebHandlerAdapter: WARN

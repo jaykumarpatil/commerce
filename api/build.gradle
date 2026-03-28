@@ -10,7 +10,7 @@ java {
     }
 }
 
-group = 'se.magnus.microservices.api'
+group = 'com.projects.microservices.api'
 version = '1.0.0-SNAPSHOT'
 
 repositories {

@@ -1,0 +1,14 @@
+package com.projects.api.core.payment;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RefundRequest {
+    private String paymentId;
+    private Double amount;
+    private String reason;
+}

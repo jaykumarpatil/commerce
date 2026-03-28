@@ -2,7 +2,7 @@
 
 All generated code MUST follow these conventions. The governance sub-skill validates compliance.
 
-> **Note:** `${basePackage}` is a project-configurable placeholder. Replace it with your project's actual base package (e.g., `com.example`, `org.acme`, etc.) when generating code.
+> **Note:** `${basePackage}` is a project-configurable placeholder. Replace it with your project's actual base package (e.g., `com.projects`, `org.acme`, etc.) when generating code.
 
 ## Package Naming
 

@@ -26,5 +26,5 @@ management:
 
 logging:
   level:
-    se.magnus.microservices.order: DEBUG
+    com.projects.microservices.order: DEBUG
     org.springframework.data.r2dbc: INFO

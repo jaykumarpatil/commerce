@@ -31,6 +31,6 @@ management:
 
 logging:
   level:
-    se.magnus.microservices.cart: DEBUG
+    com.projects.microservices.cart: DEBUG
     org.springframework.data.mongodb: INFO
     org.springframework.data.redis: INFO

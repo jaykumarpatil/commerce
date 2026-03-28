@@ -5,6 +5,6 @@ spring.cloud.stream.defaultBinder: rabbit
 logging:
   level:
     root: INFO
-    se.magnus: DEBUG
+    com.projects: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE

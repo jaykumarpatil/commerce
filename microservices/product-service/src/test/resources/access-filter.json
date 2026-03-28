@@ -9,9 +9,9 @@
     {"excludeClasses": "org.springframework.test.**"},
     {"excludeClasses": "org.springframework.boot.test.**"},
     {"excludeClasses": "org.testcontainers.**"},
-    {"excludeClasses": "se.magnus.microservices.core.product.MapperTests"},
-    {"excludeClasses": "se.magnus.microservices.core.product.MongoDbTestBase"},
-    {"excludeClasses": "se.magnus.microservices.core.product.PersistenceTests"},
-    {"excludeClasses": "se.magnus.microservices.core.product.ProductServiceApplicationTests"}
+    {"excludeClasses": "com.projects.microservices.core.product.MapperTests"},
+    {"excludeClasses": "com.projects.microservices.core.product.MongoDbTestBase"},
+    {"excludeClasses": "com.projects.microservices.core.product.PersistenceTests"},
+    {"excludeClasses": "com.projects.microservices.core.product.ProductServiceApplicationTests"}
   ]
 }

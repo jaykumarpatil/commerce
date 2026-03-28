@@ -12,9 +12,9 @@ These MUST be set before any code generation. The skill will prompt for them on 
 
 | Variable | Description | Example Values |
 |----------|-------------|----------------|
-| `${basePackage}` | Root Java package for all modules | `com.example`, `org.acme.shop`, `se.magnus` |
+| `${basePackage}` | Root Java package for all modules | `com.projects`, `org.acme.shop`, `com.projects` |
 | `${projectName}` | Human-readable project name (used in docs/commits) | `E-Commerce Platform`, `Logistics Hub` |
-| `${artifactPrefix}` | Maven/Gradle group ID prefix | `com.example`, `org.acme` |
+| `${artifactPrefix}` | Maven/Gradle group ID prefix | `com.projects`, `org.acme` |
 
 ---
 
