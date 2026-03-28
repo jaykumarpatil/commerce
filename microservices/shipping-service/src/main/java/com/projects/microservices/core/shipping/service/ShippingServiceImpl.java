@@ -106,13 +106,13 @@ public class ShippingServiceImpl implements ShippingService {
     }
 
     @Override
-    public Mono<Shipment> updateShipmentStatus(String shipmentId, String status) {
+    public Mono<Shipment> updateShipmentStatus(String shipmentId, ShipmentStatus status) {
         return shipmentRepository.findByShipmentId(shipmentId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Shipment not found: " + shipmentId)))
                 .flatMap(entity -> {
-                    entity.setStatus(status);
+                    entity.setStatus(status.name());
                     
-                    if ("DELIVERED".equals(status)) {
+                    if (ShipmentStatus.DELIVERED.equals(status)) {
                         entity.setActualDeliveryDate(java.time.LocalDateTime.now());
                     }
                     

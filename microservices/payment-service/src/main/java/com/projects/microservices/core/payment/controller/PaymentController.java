@@ -39,7 +39,7 @@ public class PaymentController implements PaymentService {
     }
 
     @Override
-    public Mono<Payment> updatePaymentStatus(String paymentId, String status) {
+    public Mono<Payment> updatePaymentStatus(String paymentId, PaymentStatus status) {
         return paymentService.updatePaymentStatus(paymentId, status);
     }
 

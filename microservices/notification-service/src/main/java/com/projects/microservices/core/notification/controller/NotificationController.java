@@ -49,6 +49,12 @@ public class NotificationController implements NotificationService {
         return notificationService.markAsRead(notificationId);
     }
 
+
+    @Override
+    public Mono<Notification> updateNotificationStatus(String notificationId, NotificationStatus status) {
+        return notificationService.updateNotificationStatus(notificationId, status);
+    }
+
     @Override
     public Mono<Void> deleteNotification(String notificationId) {
         return notificationService.deleteNotification(notificationId);

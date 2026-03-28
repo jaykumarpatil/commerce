@@ -7,6 +7,7 @@ public class Review {
   private String subject;
   private String content;
   private String serviceAddress;
+  private ReviewStatus status;
 
   public Review() {
     productId = 0;
@@ -15,6 +16,7 @@ public class Review {
     subject = null;
     content = null;
     serviceAddress = null;
+    status = ReviewStatus.PENDING_MODERATION;
   }
 
   public Review(
@@ -25,12 +27,25 @@ public class Review {
     String content,
     String serviceAddress) {
 
+    this(productId, reviewId, author, subject, content, serviceAddress, ReviewStatus.PENDING_MODERATION);
+  }
+
+  public Review(
+    int productId,
+    int reviewId,
+    String author,
+    String subject,
+    String content,
+    String serviceAddress,
+    ReviewStatus status) {
+
     this.productId = productId;
     this.reviewId = reviewId;
     this.author = author;
     this.subject = subject;
     this.content = content;
     this.serviceAddress = serviceAddress;
+    this.status = status == null ? ReviewStatus.PENDING_MODERATION : status;
   }
 
   public int getProductId() {
@@ -57,6 +72,10 @@ public class Review {
     return serviceAddress;
   }
 
+  public ReviewStatus getStatus() {
+    return status;
+  }
+
   public void setProductId(int productId) {
     this.productId = productId;
   }
@@ -79,5 +98,9 @@ public class Review {
 
   public void setServiceAddress(String serviceAddress) {
     this.serviceAddress = serviceAddress;
+  }
+
+  public void setStatus(ReviewStatus status) {
+    this.status = status;
   }
 }

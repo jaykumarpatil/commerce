@@ -131,6 +131,23 @@ public class NotificationServiceImpl implements NotificationService {
                 });
     }
 
+
+    @Override
+    public Mono<Notification> updateNotificationStatus(String notificationId, NotificationStatus status) {
+        return notificationRepository.findByNotificationId(notificationId)
+                .switchIfEmpty(Mono.error(new BadRequestException("Notification not found: " + notificationId)))
+                .flatMap(entity -> {
+                    entity.setStatus(status.name());
+                    if (NotificationStatus.READ.equals(status)) {
+                        entity.setIsRead(true);
+                        entity.setReadAt(java.time.LocalDateTime.now());
+                    }
+                    return notificationRepository.save(entity)
+                            .log(LOG.getName(), FINE)
+                            .map(notificationMapper::entityToApi);
+                });
+    }
+
     @Override
     public Mono<Void> deleteNotification(String notificationId) {
         return notificationRepository.findByNotificationId(notificationId)

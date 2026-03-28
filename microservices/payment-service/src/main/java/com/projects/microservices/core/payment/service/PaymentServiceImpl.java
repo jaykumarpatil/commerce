@@ -164,11 +164,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Mono<Payment> updatePaymentStatus(String paymentId, String status) {
+    public Mono<Payment> updatePaymentStatus(String paymentId, PaymentStatus status) {
         return paymentRepository.findByPaymentId(paymentId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Payment not found: " + paymentId)))
                 .flatMap(entity -> {
-                    entity.setPaymentStatus(status);
+                    entity.setPaymentStatus(status.name());
                     return paymentRepository.save(entity)
                             .log(LOG.getName(), FINE)
                             .map(paymentMapper::entityToApi);

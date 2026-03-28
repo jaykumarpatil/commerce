@@ -98,18 +98,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Order> updateOrderStatus(String orderId, String status) {
+    public Mono<Order> updateOrderStatus(String orderId, OrderStatus status) {
         return orderRepository.findByOrderId(orderId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Order not found: " + orderId)))
                 .flatMap(entity -> {
                     // Validate status transitions
                     String currentStatus = entity.getStatus();
-                    if (!isValidStatusTransition(currentStatus, status)) {
-                        return Mono.error(new BadRequestException("Invalid status transition from " + currentStatus + " to " + status));
+                    if (!isValidStatusTransition(currentStatus, status.name())) {
+                        return Mono.error(new BadRequestException("Invalid status transition from " + currentStatus + " to " + status.name()));
                     }
                     
-                    entity.setStatus(status);
-                    switch (status) {
+                    entity.setStatus(status.name());
+                    switch (status.name()) {
                         case "CONFIRMED":
                             entity.setConfirmedDate(java.time.LocalDateTime.now());
                             break;
@@ -128,11 +128,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Order> updatePaymentStatus(String orderId, String paymentStatus) {
+    public Mono<Order> updatePaymentStatus(String orderId, com.projects.api.core.payment.PaymentStatus paymentStatus) {
         return orderRepository.findByOrderId(orderId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Order not found: " + orderId)))
                 .flatMap(entity -> {
-                    entity.setPaymentStatus(paymentStatus);
+                    entity.setPaymentStatus(paymentStatus.name());
                     return orderRepository.save(entity)
                             .log(LOG.getName(), FINE)
                             .map(orderMapper::entityToApi);

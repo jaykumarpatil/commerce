@@ -50,7 +50,7 @@ public class ShippingController implements ShippingService {
     }
 
     @Override
-    public Mono<Shipment> updateShipmentStatus(String shipmentId, String status) {
+    public Mono<Shipment> updateShipmentStatus(String shipmentId, ShipmentStatus status) {
         return shippingService.updateShipmentStatus(shipmentId, status);
     }
 

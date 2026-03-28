@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import com.projects.api.core.review.Review;
 import com.projects.api.core.review.ReviewService;
+import com.projects.api.core.review.ReviewStatus;
 import com.projects.api.exceptions.InvalidInputException;
 import com.projects.microservices.core.review.persistence.ReviewEntity;
 import com.projects.microservices.core.review.persistence.ReviewRepository;
@@ -88,6 +89,12 @@ public class ReviewServiceImpl implements ReviewService {
     LOG.debug("Response size: {}", list.size());
 
     return list;
+  }
+
+
+  @Override
+  public Mono<Review> updateReviewStatus(int productId, int reviewId, ReviewStatus status) {
+    return Mono.error(new InvalidInputException("Review status updates are not persisted yet. Requested status: " + status));
   }
 
   @Override
