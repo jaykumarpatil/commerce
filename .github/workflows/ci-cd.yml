@@ -36,7 +36,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: frontend/package.json
 
       - name: Gradle Cache
         uses: actions/cache@v4
@@ -56,7 +56,7 @@ jobs:
 
       - name: Build Frontend
         working-directory: ./frontend
-        run: npm ci && npm run build
+        run: npm install --prefer-offline && npm run build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
