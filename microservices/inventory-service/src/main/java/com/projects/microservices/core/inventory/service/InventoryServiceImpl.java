@@ -58,6 +58,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public Mono<StockReservation> reserveStock(String productId, Integer quantity) {
+        validatePositiveQuantity(quantity, "reserve");
         return inventoryRepository.findByProductId(productId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Inventory not found for product: " + productId)))
                 .flatMap(entity -> reserveFromEntity(entity, quantity));
@@ -84,6 +85,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public Mono<InventoryItem> adjustStock(String productId, Integer quantity) {
+        validatePositiveQuantity(quantity, "adjust");
         return inventoryRepository.findByProductId(productId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Inventory not found for product: " + productId)))
                 .flatMap(entity -> adjustInventory(entity, quantity));
@@ -91,6 +93,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public Mono<Void> releaseReservedStock(String productId, Integer quantity) {
+        validatePositiveQuantity(quantity, "release");
         return inventoryRepository.findByProductId(productId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Inventory not found for product: " + productId)))
                 .flatMap(entity -> {
@@ -177,5 +180,11 @@ public class InventoryServiceImpl implements InventoryService {
         entity.setTotalQuantity(entity.getTotalQuantity() + quantity);
         entity.setAvailableQuantity(entity.getAvailableQuantity() + quantity);
         return inventoryRepository.save(entity).map(inventoryMapper::entityToApi);
+    }
+
+    private void validatePositiveQuantity(Integer quantity, String operation) {
+        if (quantity == null || quantity <= 0) {
+            throw new BadRequestException("Quantity must be greater than zero for " + operation + " operation");
+        }
     }
 }

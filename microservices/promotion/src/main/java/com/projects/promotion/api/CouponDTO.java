@@ -1,6 +1,6 @@
-package com.project.promotion.api;
+package com.projects.promotion.api;
 
-import com.project.promotion.domain.DiscountType;
+import com.projects.promotion.domain.DiscountType;
 
 public class CouponDTO {
   private String code;

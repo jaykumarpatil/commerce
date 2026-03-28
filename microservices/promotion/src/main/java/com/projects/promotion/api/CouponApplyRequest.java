@@ -1,4 +1,4 @@
-package com.project.promotion.api;
+package com.projects.promotion.api;
 
 public class CouponApplyRequest {
   private double cartTotal;

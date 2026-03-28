@@ -1,6 +1,6 @@
-package com.project.promotion.service;
+package com.projects.promotion.service;
 
-import com.project.promotion.domain.Coupon;
+import com.projects.promotion.domain.Coupon;
 import java.util.List;
 
 // Promotion MVP service contract
