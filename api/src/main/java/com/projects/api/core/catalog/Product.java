@@ -31,6 +31,10 @@ public class Product {
     private Category category;
     private java.util.List<Variant> variants;
     private java.util.List<Attribute> attributes;
+    private Double averageRating;
+    private Integer reviewCount;
+    private String stockStatus;
+    private java.util.List<String> similarProductIds;
     private String createdAt;
     private String updatedAt;
 }
