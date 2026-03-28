@@ -1,5 +1,7 @@
 package com.projects.microservices.core.notification.persistence;
 
+import com.projects.api.core.notification.NotificationChannel;
+import com.projects.api.core.notification.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,8 +17,8 @@ public class NotificationEntity {
     private Long id;
     private String notificationId;
     private String userId;
-    private com.projects.api.core.notification.NotificationType type;
-    private com.projects.api.core.notification.NotificationChannel channel;
+    private NotificationType type;
+    private NotificationChannel channel;
     private String subject;
     private String message;
     private String recipient;

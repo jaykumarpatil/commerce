@@ -1,6 +1,8 @@
 package com.projects.microservices.core.inventory.service.adapter.outbound;
 
 import com.projects.api.core.notification.Notification;
+import com.projects.api.core.notification.NotificationChannel;
+import com.projects.api.core.notification.NotificationType;
 import com.projects.microservices.core.inventory.service.port.outbound.LowStockAlertNotificationRequest;
 import com.projects.microservices.core.inventory.service.port.outbound.NotificationClientPort;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -61,8 +63,8 @@ public class NotificationClientAdapter implements NotificationClientPort {
 
         Notification notification = new Notification();
         notification.setUserId("inventory-service");
-        notification.setType(com.projects.api.core.notification.NotificationType.LOW_STOCK_ALERT);
-        notification.setChannel(com.projects.api.core.notification.NotificationChannel.SYSTEM);
+        notification.setType(NotificationType.LOW_STOCK_ALERT);
+        notification.setChannel(NotificationChannel.SYSTEM);
         notification.setSubject("Low stock alert: " + request.productId());
         notification.setMessage(context);
         notification.setRecipient(request.recipient());

@@ -55,9 +55,9 @@ public class NotificationServiceImpl implements NotificationService {
         
         return Mono.fromCallable(() -> {
             try {
-                if (com.projects.api.core.notification.NotificationChannel.EMAIL.equals(notification.getChannel())) {
+                if (NotificationChannel.EMAIL.equals(notification.getChannel())) {
                     sendEmailInternal(notification);
-                } else if (com.projects.api.core.notification.NotificationChannel.SMS.equals(notification.getChannel())) {
+                } else if (NotificationChannel.SMS.equals(notification.getChannel())) {
                     sendSMSInternal(notification);
                 }
                 
