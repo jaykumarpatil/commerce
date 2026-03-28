@@ -17,7 +17,7 @@ public class Order {
     private Double taxAmount;
     private Double shippingCost;
     private Double grandTotal;
-    private String status; // PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
+    private OrderStatus status;
     private String shippingAddress;
     private String billingAddress;
     private String paymentMethod;

@@ -22,7 +22,10 @@ public interface OrderService {
     Mono<Void> cancelOrder(String orderId);
 
     @PatchMapping("/v1/orders/{orderId}/status")
-    Mono<Order> updateOrderStatus(String orderId, String status);
+    Mono<Order> updateOrderStatus(String orderId, OrderStatus status);
+
+    @GetMapping("/v1/orders/{orderId}/events")
+    Flux<OrderEvent> getOrderEvents(String orderId);
 
     @PatchMapping("/v1/orders/{orderId}/payment")
     Mono<Order> updatePaymentStatus(String orderId, String paymentStatus);
