@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
-import org.mapstruct.factory.Mappers;
 import com.projects.api.core.review.Review;
 import com.projects.microservices.core.review.persistence.ReviewEntity;
 import com.projects.microservices.core.review.services.ReviewMapper;
@@ -15,7 +14,7 @@ import com.projects.microservices.core.review.services.ReviewMapper;
 @DisabledInNativeImage
 class MapperTests {
 
-  private ReviewMapper mapper = Mappers.getMapper(ReviewMapper.class);
+  private ReviewMapper mapper = new ReviewMapper();
 
   @Test
   void mapperTests() {

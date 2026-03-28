@@ -1,21 +1,23 @@
 package com.projects.microservices.core.product.services;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import com.projects.api.core.product.Product;
 import com.projects.microservices.core.product.persistence.ProductEntity;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface ProductMapper {
+@Component
+public class ProductMapper {
 
-  @Mappings({
-    @Mapping(target = "serviceAddress", ignore = true)
-  })
-  Product entityToApi(ProductEntity entity);
+  public Product entityToApi(ProductEntity entity) {
+    if (entity == null) {
+      return null;
+    }
+    return new Product(entity.getProductId(), entity.getName(), entity.getWeight(), null);
+  }
 
-  @Mappings({
-    @Mapping(target = "id", ignore = true), @Mapping(target = "version", ignore = true)
-  })
-  ProductEntity apiToEntity(Product api);
+  public ProductEntity apiToEntity(Product api) {
+    if (api == null) {
+      return null;
+    }
+    return new ProductEntity(api.getProductId(), api.getName(), api.getWeight());
+  }
 }

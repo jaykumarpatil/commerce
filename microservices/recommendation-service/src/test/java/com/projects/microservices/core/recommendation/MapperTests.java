@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
-import org.mapstruct.factory.Mappers;
 import com.projects.api.core.recommendation.Recommendation;
 import com.projects.microservices.core.recommendation.persistence.RecommendationEntity;
 import com.projects.microservices.core.recommendation.services.RecommendationMapper;
@@ -14,7 +13,7 @@ import com.projects.microservices.core.recommendation.services.RecommendationMap
 @DisabledInNativeImage
 class MapperTests {
 
-  private RecommendationMapper mapper = Mappers.getMapper(RecommendationMapper.class);
+  private RecommendationMapper mapper = new RecommendationMapper();
 
   @Test
   void mapperTests() {
