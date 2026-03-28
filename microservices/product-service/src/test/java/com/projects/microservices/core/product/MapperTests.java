@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
-import org.mapstruct.factory.Mappers;
 import com.projects.api.core.product.Product;
 import com.projects.microservices.core.product.persistence.ProductEntity;
 import com.projects.microservices.core.product.services.ProductMapper;
@@ -12,7 +11,7 @@ import com.projects.microservices.core.product.services.ProductMapper;
 @DisabledInNativeImage
 class MapperTests {
 
-  private ProductMapper mapper = Mappers.getMapper(ProductMapper.class);
+  private ProductMapper mapper = new ProductMapper();
 
   @Test
   void mapperTests() {

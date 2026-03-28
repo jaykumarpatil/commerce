@@ -1,29 +1,49 @@
 package com.projects.microservices.core.recommendation.services;
 
-import java.util.List;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import com.projects.api.core.recommendation.Recommendation;
 import com.projects.microservices.core.recommendation.persistence.RecommendationEntity;
+import java.util.List;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface RecommendationMapper {
+@Component
+public class RecommendationMapper {
 
-  @Mappings({
-    @Mapping(target = "rate", source = "entity.rating"),
-    @Mapping(target = "serviceAddress", ignore = true)
-  })
-  Recommendation entityToApi(RecommendationEntity entity);
+  public Recommendation entityToApi(RecommendationEntity entity) {
+    if (entity == null) {
+      return null;
+    }
+    return new Recommendation(
+        entity.getProductId(),
+        entity.getRecommendationId(),
+        entity.getAuthor(),
+        entity.getRating(),
+        entity.getContent(),
+        null);
+  }
 
-  @Mappings({
-    @Mapping(target = "rating", source = "api.rate"),
-    @Mapping(target = "id", ignore = true),
-    @Mapping(target = "version", ignore = true)
-  })
-  RecommendationEntity apiToEntity(Recommendation api);
+  public RecommendationEntity apiToEntity(Recommendation api) {
+    if (api == null) {
+      return null;
+    }
+    return new RecommendationEntity(
+        api.getProductId(),
+        api.getRecommendationId(),
+        api.getAuthor(),
+        api.getRate(),
+        api.getContent());
+  }
 
-  List<Recommendation> entityListToApiList(List<RecommendationEntity> entity);
+  public List<Recommendation> entityListToApiList(List<RecommendationEntity> entityList) {
+    if (entityList == null) {
+      return List.of();
+    }
+    return entityList.stream().map(this::entityToApi).toList();
+  }
 
-  List<RecommendationEntity> apiListToEntityList(List<Recommendation> api);
+  public List<RecommendationEntity> apiListToEntityList(List<Recommendation> apiList) {
+    if (apiList == null) {
+      return List.of();
+    }
+    return apiList.stream().map(this::apiToEntity).toList();
+  }
 }
