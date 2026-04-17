@@ -1,0 +1,19 @@
+// Top-level Gradle configuration for a modular monolith Spring Boot app.
+// Java language level will be driven by toolchains (Java 25 as requested).
+
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+}
+
+subprojects {
+  // Use Java toolchains to enforce Java 25 across Java modules
+  if (plugins.hasPlugin('java')) {
+    java {
+      toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+      }
+    }
+  }
+}

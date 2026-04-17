@@ -33,20 +33,18 @@ public interface OrderService {
     @DeleteMapping("/v1/orders/{orderId}")
     Mono<Void> cancelOrder(String orderId);
 
-    Mono<Order> updateOrderStatus(String orderId, OrderStatus status);
-
-    @Deprecated
     @PatchMapping("/v1/orders/{orderId}/status")
     Mono<Order> updateOrderStatus(String orderId, OrderStatus status);
 
     @GetMapping("/v1/orders/{orderId}/events")
     Flux<OrderEvent> getOrderEvents(String orderId);
 
-    @Deprecated
     @PatchMapping("/v1/orders/{orderId}/payment")
     default Mono<Order> updatePaymentStatus(String orderId, String paymentStatus) {
         return updatePaymentStatus(orderId, PaymentStatus.from(paymentStatus));
     }
+
+    Mono<Order> updatePaymentStatus(String orderId, PaymentStatus status);
 
     @PatchMapping("/v1/orders/{orderId}/shipping")
     Mono<Order> updateShippingInfo(String orderId, String trackingNumber, String carrier);

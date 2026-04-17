@@ -100,7 +100,7 @@ Examples from compose files:
 ## Running locally
 
 ### Prerequisites
-- Java 26+
+- Java 26
 - Docker + Docker Compose
 
 ### Build

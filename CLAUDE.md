@@ -9,7 +9,7 @@ Multi-module Gradle project implementing a microservice landscape using Spring B
 ## Build & Run Commands
 
 ```bash
-# Requires Java 17
+# Requires Java 26
 JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home
 
 # Build all modules
